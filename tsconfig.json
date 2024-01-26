@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "ES2015",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "allowJs": true,
+        "esModuleInterop": true,
+    },
+    "include": [
+        "mute8.ts"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
