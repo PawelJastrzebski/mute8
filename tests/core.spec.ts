@@ -1,4 +1,4 @@
-import { newState } from "../mute8"
+import { newState } from "../_mute8/mute8"
 import { wait } from "./utils"
 
 test('should init state', () => {
@@ -48,7 +48,6 @@ test('should subscribe 2', async () => {
     const sub = state.sub((v) => {
         subFired++;
         expect(v.name).toEqual("Amy")
-
     });
     state.mut = {
         name: "Amy"
