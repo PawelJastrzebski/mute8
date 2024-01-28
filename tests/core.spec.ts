@@ -32,7 +32,6 @@ test('should subscribe', () => {
     })
 
     const sub = state.sub((v) => console.log(v));
-    expect(sub["id"]).toBeTruthy();
     expect(sub["destroy"]).toBeTruthy();
     sub.destroy();
 });

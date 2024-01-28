@@ -1,21 +1,21 @@
+// Utils
 const deepFreeze = <T extends Object>(object: T) => {
-    const propNames = Reflect.ownKeys(object);
-    for (const name of propNames) {
+    for (const name of Reflect.ownKeys(object)) {
         const value = object[name];
-        if (typeof value === "object" || typeof value === "function") {
+        if (typeof value === "object") {
             deepFreeze(value);
         }
     }
 
     return Object.freeze(object) as Readonly<T>
 }
+const toJson = JSON.stringify
 
 // private 
-
 export class StateCore<T> {
     private subs: Record<symbol, SubFn<T>> = {}
     private inner: Readonly<T>
-    private triger: any
+    private triger: NodeJS.Timeout
 
     constructor(inner: T) {
         this.inner = deepFreeze(Object.assign({}, inner))
@@ -28,60 +28,57 @@ export class StateCore<T> {
     update(newState: Partial<T>) {
         const newFinal = deepFreeze(Object.assign(Object.assign({}, this.inner), newState));
 
-        if (JSON.stringify(this.inner) !== JSON.stringify(newFinal)) {
+        if (toJson(this.inner) !== toJson(newFinal)) {
             this.inner = newFinal;
             clearTimeout(this.triger);
-            this.triger = setTimeout(this.fireUpdate.bind(this), 0);
-        }
-    }
-
-    fireUpdate() {
-        for (const symbol of Object.getOwnPropertySymbols(this.subs)) {
-            this.subs[symbol](this.inner)
+            this.triger = setTimeout(this.notifySubs.bind(this), 0);
         }
     }
 
     updateValue(key: any, value: any) {
-        let newState = {};
-        newState[key] = value;
-        this.update(newState)
+        this.update({ [key]: value } as any)
+    }
+
+    notifySubs() {
+        for (const symbol of Object.getOwnPropertySymbols(this.subs)) {
+            this.subs[symbol](this.inner)
+        }
     }
 
     subscribe(fn: SubFn<T>): Sub {
         const id = Symbol()
         this.subs[id] = fn
         return {
-            id: id,
             destroy: () => delete this.subs[id]
         }
     }
 }
 
-export interface Statefull<T> {
+// Proxy
+export interface StateProxy<T> {
     snap(): T
     sub(fn: SubFn<T>): Sub
     set mut(v: Partial<T>)
 }
 
-// Proxy
 const propertyDescriptor: PropertyDescriptor = {
     configurable: false,
     enumerable: true,
 };
 
 export interface ProxyExtension<T> {
-    get(core: StateCore<T>, prop: string | symbol): {value: any} | null;
+    get(core: StateCore<T>, prop: string | symbol): { value: any } | null;
 }
 
 export const proxyBuilder = <T>(target: any, core: StateCore<T>, ext?: ProxyExtension<T>) => {
     return new Proxy(target, {
-        // getOwnPropertyDescriptor: (target, p) => propertyDescriptor,
+        getOwnPropertyDescriptor: (target, p) => propertyDescriptor,
         get(target, prop, receiver) {
             if (prop === 'sub') return core.subscribe.bind(core)
             if (prop === 'snap') return core.snap.bind(core)
 
             let _v = ext?.get(core, prop);
-            if(!!_v) return _v.value;
+            if (!!_v) return _v.value;
 
             return core.snap()[prop]
         },
@@ -98,10 +95,9 @@ export const proxyBuilder = <T>(target: any, core: StateCore<T>, ext?: ProxyExte
 
 // -----------------------------------------------------------------------------
 // Public
-export type State<T> = T & Statefull<T>
+export type State<T> = T & StateProxy<T>
 export type SubFn<T> = (value: Readonly<T>) => void
 export interface Sub {
-    id: symbol
     destroy(): void
 }
 
@@ -110,15 +106,7 @@ export interface StateBuilder<T extends Object> {
     actions?: {}
 }
 export const newState = <T extends Object>(state: StateBuilder<T>) => {
-    const core = new StateCore(state.value);
-    const proxy: Statefull<T> = proxyBuilder(state.value as any, core)
+    const core = new StateCore(state.value)
+    const proxy: StateProxy<T> = proxyBuilder(state.value as any, core)
     return proxy as State<T>
 }
-
-export const mut = <T>(value: Partial<T>) => {
-    return value as State<T>
-}
-export const skip = <T>() => {
-    return {} as State<T>
-}
-
