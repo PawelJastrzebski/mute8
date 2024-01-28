@@ -20,13 +20,19 @@ export interface ProxyExtension<T> {
     } | null;
 }
 export declare const proxyBuilder: <T>(target: any, core: StateCore<T>, ext?: ProxyExtension<T>) => any;
-export type State<T> = T & StateProxy<T>;
+export type State<T> = StateProxy<T> & T;
 export type SubFn<T> = (value: Readonly<T>) => void;
 export interface Sub {
     destroy(): void;
 }
-export interface StateBuilder<T extends Object> {
-    value: T;
-    actions?: {};
+export interface StateBuilder<T> {
+    value: T & object & {
+        snap?: never;
+        sub?: never;
+        mut?: never;
+    };
+    actions?: {
+        [key: string]: Function;
+    };
 }
-export declare const newState: <T extends Object>(state: StateBuilder<T>) => State<T>;
+export declare const newState: <T>(state: StateBuilder<T>) => State<T>;

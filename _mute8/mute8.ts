@@ -95,17 +95,19 @@ export const proxyBuilder = <T>(target: any, core: StateCore<T>, ext?: ProxyExte
 
 // -----------------------------------------------------------------------------
 // Public
-export type State<T> = T & StateProxy<T>
+export type State<T> = StateProxy<T> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export interface Sub {
     destroy(): void
 }
 
-export interface StateBuilder<T extends Object> {
-    value: T,
-    actions?: {}
+export interface StateBuilder<T> {
+    value: T & object & { snap?: never, sub?: never, mut?: never },
+    actions?: {
+        [key: string]: Function
+    }
 }
-export const newState = <T extends Object>(state: StateBuilder<T>) => {
+export const newState = <T>(state: StateBuilder<T>) => {
     const core = new StateCore(state.value)
     const proxy: StateProxy<T> = proxyBuilder(state.value as any, core)
     return proxy as State<T>

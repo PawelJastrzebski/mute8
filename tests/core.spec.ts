@@ -124,3 +124,21 @@ test('should mutate prop', () => {
     state.name = "Amy"
     expect(state.name).toEqual("Amy")
 });
+
+
+test('should define action', () => {
+    const state = newState({
+        value: {
+            name: "Sub"
+        },
+        actions: {
+            test(type: string) {
+
+            },
+        }
+    })
+
+    const sub = state.sub((v) => console.log(v));
+    expect(sub["destroy"]).toBeTruthy();
+    sub.destroy();
+});
