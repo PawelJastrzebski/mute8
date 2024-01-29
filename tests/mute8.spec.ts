@@ -1,4 +1,4 @@
-import { newState } from "../_mute8/mute8"
+import { newState } from "../packages/mute8/mute8"
 import { wait } from "./utils"
 
 test('should init state', () => {
@@ -7,7 +7,6 @@ test('should init state', () => {
             name: "ok"
         }
     })
-
 
     expect(state).toBeTruthy()
     expect(state.name).toEqual("ok")

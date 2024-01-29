@@ -1,19 +1,21 @@
 {
-  "name": "mut8",
+  "name": "mut8-dev",
+  "description": "Dev use only",
+  "private": "true",
   "version": "1.0.0",
-  "description": "",
-  "main": "mut8.js",
   "type": "module",
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "npm run test:watch",
     "test": "npx jest",
-    "test:watch": "npx jest --watchAll"
+    "test:watch": "npx jest --watchAll",
+    "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",
+    "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react"
   },
   "engines": {
     "node": ">=21.0.0"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Paweł Jastrzębski",
+  "license": "MIT",
   "peerDependencies": {
     "react": "^18.2.0"
   },
@@ -26,6 +28,7 @@
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "ts-node": "^9.1.1",
+    "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   }
 }

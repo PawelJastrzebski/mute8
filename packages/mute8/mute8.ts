@@ -1,16 +1,18 @@
 // Utils
+const O = Object;
+const J = JSON;
 const deepFreeze = <T extends Object>(object: T) => {
-    for (const name of Reflect.ownKeys(object)) {
+    for (const name of O.keys(object)) {
         const value = object[name];
         if (typeof value === "object") {
             deepFreeze(value);
         }
     }
 
-    return Object.freeze(object) as Readonly<T>
+    return O.freeze(object) as Readonly<T>
 }
-const toJson = JSON.stringify
-const deepClone = (obj: object) => JSON.parse(toJson(obj))
+const toJson = J.stringify
+const deepClone = (obj: object) => J.parse(toJson(obj))
 
 // private 
 export class StateCore<T, A> {
@@ -21,13 +23,13 @@ export class StateCore<T, A> {
     readonly actionsProxy: any
 
     constructor(inner: T, actions: A) {
-        this.inner = deepFreeze(Object.assign({}, inner))
+        this.inner = deepFreeze(O.assign({}, inner))
         this.actions = actions;
-        this.actionsProxy = Object.freeze(buildActionsProxy(this))
+        this.actionsProxy = O.freeze(buildActionsProxy(this))
     }
 
     getAction(action_name: string | symbol) : any {
-        this.actions[action_name]
+        return this.actions[action_name]
     }
 
     snap(): Readonly<T> {
@@ -35,7 +37,7 @@ export class StateCore<T, A> {
     }
 
     update(newState: Partial<T>) {
-        const newFinal = deepFreeze(Object.assign(Object.assign({}, this.inner), newState));
+        const newFinal = deepFreeze(O.assign(O.assign({}, this.inner), newState));
 
         if (toJson(this.inner) !== toJson(newFinal)) {
             this.inner = newFinal;
@@ -49,7 +51,7 @@ export class StateCore<T, A> {
     }
 
     notifySubs() {
-        for (const symbol of Object.getOwnPropertySymbols(this.subs)) {
+        for (const symbol of O.getOwnPropertySymbols(this.subs)) {
             this.subs[symbol](this.inner)
         }
     }
@@ -92,7 +94,7 @@ export interface ProxyExtension<T, A> {
     get(core: StateCore<T, A>, prop: string | symbol): { value: any } | null;
 }
 
-export const buildStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
+export const newStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
     return new Proxy(target, {
         getOwnPropertyDescriptor: () => ({
             configurable: false,
@@ -135,6 +137,6 @@ export interface StateDefiniton<T, A> {
 }
 export const newState = <T, A>(state: StateDefiniton<T, A>) => {
     const core = new StateCore(state.value, state.actions ?? {})
-    const proxy: StateProxy<T, A> = buildStateProxy(state.value, core)
+    const proxy: StateProxy<T, A> = newStateProxy(state.value, core)
     return proxy as State<T, A>
 }

@@ -1,5 +1,4 @@
-import { newState } from "../_mute8-react/mute8-react"
-
+import { newState } from "../packages/mute8-react/mute8-react"
 
 test('should init state', () => {
     const state = newState({

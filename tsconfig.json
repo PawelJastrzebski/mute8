@@ -8,10 +8,11 @@
         "removeComments": true,
         "noLib": false,
         "esModuleInterop": true,
+        "noEmit": true
     },
     "include": [
-        "_mute8/mute8.ts",
-        "_mute8-react/mute8-react.ts"
+        "packages/mute8-react/mute8-react.ts",
+        "packages/mute8/mute8.ts"
     ],
     "exclude": [
         "node_modules"
