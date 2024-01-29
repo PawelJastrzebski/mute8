@@ -17,13 +17,17 @@ export class StateCore<T, A> {
     private subs: Record<symbol, SubFn<T>> = {}
     private inner: Readonly<T>
     private triger: NodeJS.Timeout
+    private actions: A
     readonly actionsProxy: any
-    readonly actions: A
 
     constructor(inner: T, actions: A) {
         this.inner = deepFreeze(Object.assign({}, inner))
         this.actions = actions;
         this.actionsProxy = Object.freeze(buildActionsProxy(this))
+    }
+
+    getAction(action_name: string | symbol) : any {
+        this.actions[action_name]
     }
 
     snap(): Readonly<T> {
@@ -67,7 +71,7 @@ const buildActionsProxy = <T,A>(core: StateCore<T,A>) => (new Proxy({}, {
         writable: false
     }),
     get(_, action_name) {
-        const native_action = core.actions[action_name];
+        const native_action = core.getAction(action_name);
         return async (...args: any[]) => {
             const state = deepClone(core.snap())
             await native_action.bind(state)(...args)
@@ -123,13 +127,13 @@ export interface Sub {
 }
 
 export type VoidFn = ((...args: any) => Promise<void>);
-export interface StateBuilder<T, A> {
+export interface StateDefiniton<T, A> {
     value: T & object & { actions?: never, snap?: never, sub?: never, mut?: never },
     actions?: A & ThisType<T & Readonly<A>> & {
         [key: string]: VoidFn
     }
 }
-export const newState = <T, A>(state: StateBuilder<T, A>) => {
+export const newState = <T, A>(state: StateDefiniton<T, A>) => {
     const core = new StateCore(state.value, state.actions ?? {})
     const proxy: StateProxy<T, A> = buildStateProxy(state.value, core)
     return proxy as State<T, A>

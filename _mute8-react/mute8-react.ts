@@ -1,5 +1,5 @@
 import * as mute8 from "../_mute8/mute8"
-import { State as mute8State, StateBuilder, ProxyExtension } from "../_mute8/mute8"
+import { State as mute8State, StateDefiniton, ProxyExtension } from "../_mute8/mute8"
 import { useState, useEffect } from 'react';
 
 
@@ -46,7 +46,7 @@ const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
     }
 })
 
-export const newState = <T extends Object, A>(state: StateBuilder<T, A>) => {
+export const newState = <T extends Object, A>(state: StateDefiniton<T, A>) => {
     const core = new mute8.StateCore(state.value, state.actions);
     const proxy = mute8.buildStateProxy(state.value as any, core, proxyExtension())
     return proxy as State<T, A>
