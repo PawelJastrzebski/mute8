@@ -1,8 +1,8 @@
 import * as mute8 from "../mute8/mute8"
-import { State as mute8State, StateDefiniton, ProxyExtension } from "../mute8/mute8"
+import { State as SateMute8, StateDefiniton, ProxyExtension } from "../mute8/mute8"
 import { useState, useEffect } from 'react';
 
-export type State<T, A> = mute8State<T, A> & {
+export type State<T, A> = SateMute8<T, A> & {
     use(): [T, (newValeu: Partial<T>) => void]
     useOne<K extends keyof T>(property: K): [T[K], (newValue: T[K]) => void]
 }
