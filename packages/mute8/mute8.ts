@@ -56,7 +56,7 @@ export class StateCore<T, A> {
         }
     }
 
-    subscribe(fn: SubFn<T>): Sub {
+    sub(fn: SubFn<T>): Sub {
         const id = Symbol()
         this.subs[id] = fn
         return {
@@ -101,7 +101,7 @@ export const newStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: Pr
             enumerable: true,
         }),
         get(_, prop) {
-            if (prop === 'sub') return core.subscribe.bind(core)
+            if (prop === 'sub') return core.sub.bind(core)
             if (prop === 'snap') return core.snap.bind(core)
             if (prop === 'actions') return core.actionsProxy;
 

@@ -14,7 +14,7 @@ const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
             const use_fn = () => {
                 const [value, setValue] = useState(core.snap());
                 useEffect(() => {
-                    const sub = core.subscribe((s) => setValue(s))
+                    const sub = core.sub((s) => setValue(s))
                     return () => sub.destroy()
                 }, [])
 
@@ -30,7 +30,7 @@ const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
             const use_fn = (property: keyof T) => {
                 const [value, setValue] = useState((core.snap() as any)[property]);
                 useEffect(() => {
-                    const sub = core.subscribe((s: any) => setValue(s[property]))
+                    const sub = core.sub((s: any) => setValue(s[property]))
                     return () => sub.destroy()
                 }, [])
                 return [value, (v: any) => core.updateValue(property, v)]
