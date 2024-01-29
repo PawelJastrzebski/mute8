@@ -151,3 +151,68 @@ test('should define action', async () => {
     await wait(10)
     expect(state.name).toEqual("ActionAsync Not Awaited")
 });
+
+
+
+test('example car store', async () => {
+    interface Car {
+        id: number,
+        brand: string,
+        model: string,
+        year: number
+    }
+
+    const state = newState({
+        value: {
+            cars: [] as Car[]
+        },
+        actions: {
+            async addCar(car: Car) {
+                this.cars.push(car)
+            },
+            async removeCar(id: number) {
+                this.cars = this.cars.filter(c => c.id != id)
+            },
+        }
+    })
+
+    await state.actions.addCar({
+        id: 1,
+        brand: "Test",
+        model: "3",
+        year: 2022
+    });
+
+    await state.actions.addCar({
+        id: 2,
+        brand: "Test",
+        model: "X",
+        year: 2018
+    });
+
+    expect(state.cars).toEqual([
+        {
+            id: 1,
+            brand: "Test",
+            model: "3",
+            year: 2022
+        },
+        {
+            id: 2,
+            brand: "Test",
+            model: "X",
+            year: 2018
+        }
+    ])
+
+    await state.actions.removeCar(1);
+    expect(state.cars).toEqual([
+        {
+            id: 2,
+            brand: "Test",
+            model: "X",
+            year: 2018
+        }
+    ])
+    
+});

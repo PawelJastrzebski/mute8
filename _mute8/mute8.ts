@@ -10,6 +10,7 @@ const deepFreeze = <T extends Object>(object: T) => {
     return Object.freeze(object) as Readonly<T>
 }
 const toJson = JSON.stringify
+const deepClone = (obj: object) => JSON.parse(JSON.stringify(obj))
 
 // private 
 export class StateCore<T, A> {
@@ -23,6 +24,7 @@ export class StateCore<T, A> {
         this.inner = deepFreeze(Object.assign({}, inner))
         this.actions = actions;
         this.actionsProxy = Object.freeze(buildActionsProxy(this))
+        // this.actionsProxy = buildActionsProxy(this)
     }
 
     snap(): Readonly<T> {
@@ -68,7 +70,7 @@ const buildActionsProxy = <T,A>(core: StateCore<T,A>) => (new Proxy({}, {
     get(_, action_name) {
         const native_action = core.actions[action_name];
         return async (...args: any[]) => {
-            const state = Object.assign({}, core.snap())
+            const state = deepClone(core.snap())
             await native_action.bind(state)(...args)
             core.update(state)
         }

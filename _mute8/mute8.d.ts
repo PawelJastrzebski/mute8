@@ -23,12 +23,12 @@ export interface ProxyExtension<T, A> {
     } | null;
 }
 export declare const buildStateProxy: <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => any;
-export type VoidFn = ((...args: any) => Promise<void>);
 export type State<T, A> = StateProxy<T, A> & T;
 export type SubFn<T> = (value: Readonly<T>) => void;
 export interface Sub {
     destroy(): void;
 }
+export type VoidFn = ((...args: any) => Promise<void>);
 export interface StateBuilder<T, A> {
     value: T & object & {
         actions?: never;
