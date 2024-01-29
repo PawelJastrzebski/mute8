@@ -59,7 +59,6 @@ export class StateCore<T, A> {
 }
 
 // Actions Proxy 
-
 const buildActionsProxy = <T,A>(core: StateCore<T,A>) => (new Proxy({}, {
     getOwnPropertyDescriptor: () => ({
         configurable: false,

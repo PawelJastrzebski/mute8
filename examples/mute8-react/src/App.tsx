@@ -7,6 +7,11 @@ const state = newState({
     count: 0,
     count2: 0,
     appName: "Vite + React + mute8"
+  }, 
+  actions: {
+    async incrementCounter2(value: number) {
+      this.count2 = this.count2 + value;
+    }
   }
 })
 
@@ -41,7 +46,10 @@ function App() {
       <div className="card">
         <h4>count is {count}</h4>
         <button onClick={() => setCount2(count2 + 1)}>
-          count2 is {count2}
+          count2 react hook {count2}
+        </button>
+        <button onClick={() => state.actions.incrementCounter2(1)}>
+          count2 mute8 action {count2}
         </button>
         <br />
         <br />
