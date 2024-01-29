@@ -126,19 +126,28 @@ test('should mutate prop', () => {
 });
 
 
-test('should define action', () => {
+test('should define action', async () => {
     const state = newState({
         value: {
             name: "Sub"
         },
         actions: {
-            test(type: string) {
-
+            async setName(name: string) {
+                this.name = name
+            },
+            async setNameAsync(name: string, wait_ms: number) {
+                await wait(wait_ms)
+                this.name = name
             },
         }
     })
+    await state.actions.setName("Action");
+    expect(state.name).toEqual("Action")
 
-    const sub = state.sub((v) => console.log(v));
-    expect(sub["destroy"]).toBeTruthy();
-    sub.destroy();
+    await state.actions.setNameAsync("ActionAsync", 10);
+    expect(state.name).toEqual("ActionAsync")
+
+    state.actions.setNameAsync("ActionAsync Not Awaited", 5);
+    await wait(10)
+    expect(state.name).toEqual("ActionAsync Not Awaited")
 });

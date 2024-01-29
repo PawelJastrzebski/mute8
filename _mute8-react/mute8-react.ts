@@ -3,12 +3,12 @@ import { State as mute8State, StateBuilder, ProxyExtension } from "../_mute8/mut
 import { useState, useEffect } from 'react';
 
 
-export type State<T> = mute8State<T> & {
+export type State<T, A> = mute8State<T, A> & {
     use(): [T, (newValeu: Partial<T>) => void]
     useOne<K extends keyof T>(property: K): [T[K], (newValue: T[K]) => void]
 }
 
-const proxyExtension: <T>() => ProxyExtension<T> = <T>() =>
+const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
 ({
     get(core, prop) {
         if (prop === 'use') {
@@ -46,8 +46,8 @@ const proxyExtension: <T>() => ProxyExtension<T> = <T>() =>
     }
 })
 
-export const newState = <T extends Object>(state: StateBuilder<T>) => {
-    const core = new mute8.StateCore(state.value);
-    const proxy = mute8.proxyBuilder(state.value as any, core, proxyExtension())
-    return proxy as State<T>
+export const newState = <T extends Object, A>(state: StateBuilder<T, A>) => {
+    const core = new mute8.StateCore(state.value, state.actions);
+    const proxy = mute8.buildStateProxy(state.value as any, core, proxyExtension())
+    return proxy as State<T, A>
 }

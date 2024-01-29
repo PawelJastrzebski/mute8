@@ -32,7 +32,7 @@ const proxyExtension = () => ({
     }
 });
 export const newState = (state) => {
-    const core = new mute8.StateCore(state.value);
-    const proxy = mute8.proxyBuilder(state.value, core, proxyExtension());
+    const core = new mute8.StateCore(state.value, state.actions);
+    const proxy = mute8.buildStateProxy(state.value, core, proxyExtension());
     return proxy;
 };

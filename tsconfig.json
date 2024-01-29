@@ -3,11 +3,10 @@
         "target": "ESNext",
         "module": "ESNext",
         "moduleResolution": "Node",
+        "noImplicitThis": true,
         "declaration": true,
-        "noImplicitAny": false,
         "removeComments": true,
         "noLib": false,
-        "allowJs": true,
         "esModuleInterop": true,
     },
     "include": [
