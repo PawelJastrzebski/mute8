@@ -96,8 +96,7 @@ test('should subscribe - unsubscribe ', async () => {
 
 });
 
-
-test('should mutate', () => {
+test('should mutate (set)', () => {
     const state = newState({
         value: {
             name: "Tom"
@@ -111,6 +110,17 @@ test('should mutate', () => {
     expect(state.name).toEqual("Amy")
 });
 
+test('should mutate (mutFn)', () => {
+    const state = newState({
+        value: {
+            name: "Tom"
+        }
+    })
+
+    expect(state.name).toEqual("Tom")
+    state.mut(v => v.name = "Amy")
+    expect(state.name).toEqual("Amy")
+});
 
 test('should mutate prop', () => {
     const state = newState({

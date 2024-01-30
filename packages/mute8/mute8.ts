@@ -24,19 +24,30 @@ export class StateCore<T, A> {
 
     constructor(inner: T, actions: A) {
         this.inner = deepFreeze(O.assign({}, inner))
-        this.actions = actions;
+        this.actions = O.freeze(actions);
         this.actionsProxy = O.freeze(buildActionsProxy(this))
-    }
-
-    getAction(action_name: string | symbol) : any {
-        return this.actions[action_name]
     }
 
     snap(): Readonly<T> {
         return this.inner
     }
 
-    update(newState: Partial<T>) {
+    getActionFn(action_name: string | symbol): Function {
+        const action_fn = this.actions[action_name]
+        return async (...args: any[]) => {
+            const state = deepClone(this.snap())
+            await action_fn.bind(state)(...args)
+            this.update(state)
+        }
+    }
+
+    mutFn(fn: (v: T) => void): void {
+        const state = deepClone(this.snap())
+        fn(state)
+        this.update(state)
+    }
+
+    update(newState: Partial<T>): void {
         const newFinal = deepFreeze(O.assign(O.assign({}, this.inner), newState));
 
         if (toJson(this.inner) !== toJson(newFinal)) {
@@ -46,11 +57,11 @@ export class StateCore<T, A> {
         }
     }
 
-    updateValue(key: any, value: any) {
+    updateValue(key: any, value: any): void {
         this.update({ [key]: value } as any)
     }
 
-    notifySubs() {
+    notifySubs(): void {
         for (const symbol of O.getOwnPropertySymbols(this.subs)) {
             this.subs[symbol](this.inner)
         }
@@ -66,19 +77,14 @@ export class StateCore<T, A> {
 }
 
 // Actions Proxy 
-const buildActionsProxy = <T,A>(core: StateCore<T,A>) => (new Proxy({}, {
+const buildActionsProxy = <T, A>(core: StateCore<T, A>) => (new Proxy({}, {
     getOwnPropertyDescriptor: () => ({
         configurable: false,
         enumerable: false,
         writable: false
     }),
     get(_, action_name) {
-        const native_action = core.getAction(action_name);
-        return async (...args: any[]) => {
-            const state = deepClone(core.snap())
-            await native_action.bind(state)(...args)
-            core.update(state)
-        }
+        return core.getActionFn(action_name)
     },
 }))
 
@@ -87,6 +93,7 @@ export interface StateProxy<T, A> {
     snap(): T
     sub(fn: SubFn<T>): Sub
     set mut(v: Partial<T>)
+    get mut(): (fn: (v: T) => void) => void
     actions: A
 }
 
@@ -103,6 +110,7 @@ export const newStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: Pr
         get(_, prop) {
             if (prop === 'sub') return core.sub.bind(core)
             if (prop === 'snap') return core.snap.bind(core)
+            if (prop === 'mut') return core.mutFn.bind(core)
             if (prop === 'actions') return core.actionsProxy;
 
             let _v = ext?.get(core, prop);
