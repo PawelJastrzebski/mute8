@@ -20,5 +20,8 @@
         "Observable",
         "Reactive",
         "Immutable"
-    ]
+    ],
+    "peerDependencies": {
+        "react": "^18.2.0"
+    }
 }
