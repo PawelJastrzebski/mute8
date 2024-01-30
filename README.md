@@ -2,21 +2,31 @@
 # mute8 - JS State Container
 ![mute8](doc/mut8.svg)
 
-## Under construction 🚧
+### Under construction 🚧
 Project is in early stage of development
 
-## Why?
+### Why?
 Inspired by recoil and redux to provide simple state managment solution
+
+## Instalation
+**JavaScript**
+```sh
+npm i mute8
+```
+**React**
+```sh
+npm i mute8-react
+```
 
 ## Examples
 For full examples go to `examples` directory
 
-### Import
+#### Import
 ```ts
 import { newState } from 'mute8-react'
 ```
 
-### Create new state
+#### Create new state
 ```ts
 interface Car {
     id: number,
@@ -40,7 +50,7 @@ const state = newState({
 })
 ```
 
-### Update state
+#### Update state
 ```ts
 await state.actions.addCar({
     id: 1,
@@ -56,7 +66,7 @@ await state.actions.addCar({
     year: 2022
 });
 ```
-### Use in component
+#### Use in component
 
 ```tsx 
 function CarStore() {
