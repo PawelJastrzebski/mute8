@@ -1,13 +1,17 @@
-import { newState } from 'mute8-react'
+import { createStore } from 'mute8-react'
 import './App.css'
+import { useEffect } from 'react';
 
-const state = newState({
+const store = createStore({
   value: {
-    count: 0,
+    count: 1,
     count2: 0,
     appName: "Vite + React + mute8"
-  }, 
+  },
   actions: {
+    async incrementCounter1(value: number) {
+      this.count = this.count + value;
+    },
     async incrementCounter2(value: number) {
       this.count2 = this.count2 + value;
     }
@@ -15,46 +19,63 @@ const state = newState({
 })
 
 setInterval(() => {
-  state.count = state.count + 100;
-  state.count = state.count + 100;
+  store.count = store.count + 100;
+  store.count = store.count + 100;
 }, 100)
 
 setInterval(() => {
-  state.count = state.count + 1;
-  state.count = Math.floor(state.count * 2)
+  store.count = store.count + 1;
+  store.count = Math.floor(store.count * 2)
 
-  state.count2 = state.count2 + 1000;
+  store.count2 = store.count2 + 1000;
 }, 100)
 
 setInterval(() => {
-  state.count = 0
-  state.count2 = 0
+  store.count = 0
+  store.count2 = 0
 }, 20_000)
 
-// state.sub((v) => console.log(v.count))
+store.sub((v) => console.log(v.count))
 
 function App() {
-  const [, setFull] = state.use();
-  const [count,] = state.useOne('count')
-  const [count2, setCount2] = state.useOne("count2")
-  const [name, setName] = state.useOne("appName")
+  const [, setFull] = store.use();
+  const [count1, setCount1] = store.useOne('count')
+  const [name, setName] = store.useOne("appName")
+
+  const selectedCount1 = store.useSelector((state) => state.count);
+
+  useEffect(() => {
+    console.log('render')
+  })
+
+  const testDispatch = () => {
+    store.dispatch((state) => {
+      state.count = 100;
+      state.count2 = 200;
+      state.appName = "Vite + React + mute8 (updated)"
+    });
+  }
 
   return (
     <>
       <h1>{name}</h1>
       <div className="card">
-        <h4>count is {count}</h4>
-        <button onClick={() => setCount2(count2 + 1)}>
-          count2 react hook {count2}
+        <h4>count is { count1 }</h4>
+        <h4>count from useSelector is { selectedCount1 }</h4>
+        <button onClick={() => setCount1(count1 + 1)}>
+          count1 react hook { count1 }
         </button>
-        <button onClick={() => state.actions.incrementCounter2(1)}>
-          count2 mute8 action {count2}
+        <button onClick={() => store.actions.incrementCounter1(1)}>
+          count1 mute8 action { count1 }
+        </button>
+        <button onClick={testDispatch}>
+          test dispach mute8
         </button>
         <br />
         <br />
         <div style={{ display: "flex", justifyContent: "center"}}>
           <div>App Name (direct update) <br />
-            <input value={name} onChange={(e) => state.appName = e.target.value} type='text'></input>
+            <input value={name} onChange={(e) => store.appName = e.target.value} type='text'></input>
           </div>
           <div>
             App Name (React hook) <br />
