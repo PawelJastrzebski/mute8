@@ -87,6 +87,28 @@ function CarStore() {
   )
 }
 ```
+#### Dispatch actions
+```tsx
+function randomNumber(min: number, max: number) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+```
+```tsx
+function AddNew() {
+  return (
+    <button onClick={() => {
+      state.actions.addCar({
+        id: randomNumber(100, 100_000),
+        brand: "Tesla",
+        model: "Cybertruck",
+        year: randomNumber(2024, 2077)
+      });
+    }}>
+      Add new
+    </button>
+  )
+}
+```
 
 ## Authors
 - Paweł Jastrzębski 🇵🇱
