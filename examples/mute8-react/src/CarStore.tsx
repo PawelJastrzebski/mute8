@@ -35,9 +35,9 @@ await state.actions.addCar({
 
 await state.actions.addCar({
   id: 2,
-  brand: "Tesla",
-  model: "X",
-  year: 2018
+  brand: "Porsche",
+  model: "911",
+  year: 2022
 });
 
 function AddNew() {
@@ -46,8 +46,8 @@ function AddNew() {
       state.actions.addCar({
         id: randomNumber(100, 100_000),
         brand: "Tesla",
-        model: "Y",
-        year: randomNumber(2000, 2024)
+        model: "Cybertruck",
+        year: randomNumber(2024, 2077)
       });
     }}>
       Add new
