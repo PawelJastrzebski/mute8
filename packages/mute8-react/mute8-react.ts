@@ -1,10 +1,13 @@
-import * as mute8 from "../mute8/mute8"
-import { State as SateMute8, StateDefiniton, ProxyExtension } from "../mute8/mute8"
-import { useState, useEffect } from 'react';
+import { Store as Mute8Store, StateDefiniton, ProxyExtension, createStore as _createStore } from "../mute8/mute8"
+import { useState, useCallback, useEffect } from 'react';
+import Provider from './components/provider'
+import ReactMute8Context, { ReactMute8ContextValue } from "./components/context";
 
-export type State<T, A> = SateMute8<T, A> & {
+export type Store<T, A> = Mute8Store<T, A> & {
     use(): [T, (newValeu: Partial<T>) => void]
     useOne<K extends keyof T>(property: K): [T[K], (newValue: T[K]) => void]
+    useStateContext(): T;
+    useSelector<Selected extends unknown>(selector: (state: T) => Selected): Selected
 }
 
 const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
@@ -41,14 +44,32 @@ const proxyExtension: <T, A>() => ProxyExtension<T, A> = <T>() =>
             }
         }
 
+        if (prop === 'useSelector') {
+            const use_fn = <T, A>(
+                selector: (state: Readonly<T>) => A
+            ) => {
+
+                if (!selector) {
+                    throw new Error('Selector is required')
+                }
+
+                if (typeof selector !== 'function') {
+                    throw new Error('Selector must be a function')
+                }
+
+                return selector(core.snap() as any)
+            };
+
+            return {
+                value: use_fn
+            }
+        }
+
         return null;
     }
 })
 
-export const newState = <T extends Object, A>(state: StateDefiniton<T, A>) => {
-    const core = new mute8.StateCore(state.value, state.actions);
-    const proxy = mute8.newStateProxy(state.value as any, core, proxyExtension())
-    return proxy as State<T, A>
-}
+export const createStore = <T extends Object, A>(state: StateDefiniton<T, A>) => _createStore(state, [proxyExtension()]) as Store<T, A>;
 
 export { SubFn, VoidFn, Sub } from "../mute8/mute8"
+export { Provider, ReactMute8Context, ReactMute8ContextValue }
