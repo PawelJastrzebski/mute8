@@ -87,7 +87,7 @@ function CarStore() {
   )
 }
 ```
-#### Dispatch actions
+#### Dispatch action
 ```tsx
 function randomNumber(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);
