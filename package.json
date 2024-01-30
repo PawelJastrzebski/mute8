@@ -9,9 +9,13 @@
     "test": "npx jest",
     "lint": "tsc --watch",
     "test:watch": "npx jest --watchAll",
-    "build": "concurrently -n mute8,mute8-react \"npm run build:mute8\" \"npm run build:mute8-react\" ",
+    "build": "npm run build:clean && concurrently -n mute8,mute8-react \"npm run build:mute8\" \"npm run build:mute8-react\" ",
     "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",
-    "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react"
+    "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react",
+    "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
+    "publish": "npm run build && npm run publish:npm",
+    "publish:npm": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run",
+    "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run"
   },
   "engines": {
     "node": ">=21.0.0"

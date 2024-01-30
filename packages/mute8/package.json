@@ -5,10 +5,14 @@
     "type": "module",
     "author": "Paweł Jastrzębski",
     "license": "MIT",
-    "repository": "github.com/PawelJastrzebski/mute8",
-    "main": "dist/mute8.js",
-    "module": "dist/mute8.mjs",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8.cjs",
+    "module": "dist/mute8.js",
     "types": "dist/mute8.d.ts",
+    "scripts": {},
     "keywords": [
         "State",
         "Redux",
