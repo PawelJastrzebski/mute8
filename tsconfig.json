@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
-        "target": "ES6",
-        "module": "ES2015",
-        "declaration": false,
-        "noImplicitAny": false,
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "noImplicitThis": true,
+        "declaration": true,
         "removeComments": true,
         "noLib": false,
-        "allowJs": true,
         "esModuleInterop": true,
+        "noEmit": true
     },
     "include": [
-        "mute8.ts"
+        "packages/mute8-react/mute8-react.ts",
+        "packages/mute8/mute8.ts"
     ],
     "exclude": [
         "node_modules"

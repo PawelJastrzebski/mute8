@@ -1,27 +1,41 @@
 {
-  "name": "mut8",
+  "name": "mute8-dev",
+  "description": "Do not publish | package.json for local development ony",
+  "private": "true",
   "version": "1.0.0",
-  "description": "",
-  "main": "mut8.js",
   "type": "module",
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "npm run test:watch",
     "test": "npx jest",
-    "test:watch": "npx jest --watchAll"
+    "lint": "tsc --watch",
+    "test:watch": "npx jest --watchAll",
+    "build": "npm run build:clean && concurrently -n mute8,mute8-react \"npm run build:mute8\" \"npm run build:mute8-react\" ",
+    "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",
+    "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react",
+    "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
+    "publish": "npm run build && npm run publish:npm",
+    "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react",
+    "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run"
   },
   "engines": {
     "node": ">=21.0.0"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Paweł Jastrzębski",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@babel/preset-env": "^7.23.9",
     "@babel/preset-typescript": "^7.23.3",
     "@types/jest": "^29.5.11",
+    "@types/react": "^18.2.48",
     "babel-jest": "^29.7.0",
+    "concurrently": "^8.2.2",
     "jest": "^29.7.0",
     "ts-node": "^9.1.1",
+    "tsup": "^8.0.1",
     "typescript": "^5.3.3"
   }
 }
