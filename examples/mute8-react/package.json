@@ -1,5 +1,5 @@
 {
-  "name": "mute8-react",
+  "name": "mute8-react-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "mute8-react": "file:../../packages/mute8-react",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

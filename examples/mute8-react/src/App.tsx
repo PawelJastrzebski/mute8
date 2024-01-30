@@ -1,6 +1,5 @@
-import { newState } from '../../../_mute8-react/mute8-react'
+import { newState } from 'mute8-react'
 import './App.css'
-
 
 const state = newState({
   value: {
