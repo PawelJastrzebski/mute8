@@ -1,6 +1,6 @@
 
 # mute8 - JS State Container
-![mute8](doc/mut8.png)
+![mute8](doc/mut8.svg)
 
 ## Under construction 🚧
 Project is in early stage of development
