@@ -1,12 +1,13 @@
 {
-  "name": "mut8-dev",
-  "description": "Dev use only",
+  "name": "mute8-dev",
+  "description": "Do not publish | package.json for local development ony",
   "private": "true",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "npm run test:watch",
     "test": "npx jest",
+    "lint": "tsc --watch",
     "test:watch": "npx jest --watchAll",
     "build": "concurrently -n mute8,mute8-react \"npm run build:mute8\" \"npm run build:mute8-react\" ",
     "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",

@@ -1,0 +1,19 @@
+{
+    "name": "mute8",
+    "description": "JS State Container",
+    "version": "0.0.0-alpha.1",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "license": "MIT",
+    "repository": "github.com/PawelJastrzebski/mute8",
+    "main": "dist/mute8.js",
+    "module": "dist/mute8.mjs",
+    "types": "dist/mute8.d.ts",
+    "keywords": [
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable"
+    ]
+}
