@@ -9,7 +9,6 @@ Project is in early stage of development
 Inspired by recoil and redux to provide simple state managment solution
 
 ## Examples
-
 For full examples go to `examples` directory
 
 ### Import
