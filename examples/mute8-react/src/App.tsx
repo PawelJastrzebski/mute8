@@ -34,10 +34,10 @@ setInterval(() => {
 // state.sub((v) => console.log(v.count))
 
 function App() {
-  const [, setFull] = store.use();
-  const [count,] = store.useOne('count')
-  const [count2, setCount2] = store.useOne("count2")
-  const [name, setName] = store.useOne("appName")
+  const [, setFull] = store.react.use();
+  const [count,] = store.react.useOne('count')
+  const [count2, setCount2] = store.react.useOne("count2")
+  const [name, setName] = store.react.useOne("appName")
 
   return (
     <>

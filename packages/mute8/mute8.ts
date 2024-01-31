@@ -98,10 +98,14 @@ export interface StoreProxy<T, A> {
 }
 
 export interface ProxyExtension<T, A> {
-    get(core: StateCore<T, A>, prop: string | symbol): { value: any } | null;
+    name: string,
+    init(core: StateCore<T, A>): object
 }
 
 export const newStoreProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
+    const extenstion = ext?.init(core)
+    const extenstionName = ext?.name ?? null;
+    
     return new Proxy(target, {
         getOwnPropertyDescriptor: () => ({
             configurable: false,
@@ -112,10 +116,7 @@ export const newStoreProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: Pr
             if (prop === 'snap') return core.snap.bind(core)
             if (prop === 'mut') return core.mutFn.bind(core)
             if (prop === 'actions') return core.actionsProxy;
-
-            let _v = ext?.get(core, prop);
-            if (!!_v) return _v.value;
-
+            if (extenstionName && prop === extenstionName) return extenstion
             return core.snap()[prop]
         },
         set(_, prop, value) {

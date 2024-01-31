@@ -9,8 +9,10 @@ test('should init state', () => {
 
     expect(state).toBeTruthy()
     expect(state.name).toEqual("ok")
-    expect(state.use).toBeTruthy()
-    expect(state.use.apply).toBeTruthy()
+    expect(state.react).toBeTruthy()
+    expect(state.react.use).toBeTruthy()
+    expect(state.react.useOne).toBeTruthy()
+    expect(state.react.useOne.apply).toBeTruthy()
 });
 
 test('should mutate (mutFn)', () => {

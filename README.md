@@ -70,7 +70,7 @@ await store.actions.addCar({
 
 ```tsx 
 function CarStore() {
-  const [cars,] = store.useOne('cars')
+  const [cars,] = store.react.useOne('cars')
   const carsList = cars.map(car => (
     <li key={car.id} onClick={() => store.actions.removeCar(car.id)}>
       {car.brand} {car.model} | {car.year}
