@@ -161,7 +161,17 @@ test('should define action', async () => {
     expect(state.name).toEqual("ActionAsync Not Awaited")
 });
 
+test('example of functional action', async () => {
+    const state = newState({
+        value: {
+            counter: 1
+        }
+    })
+    const incrementCounter = () => state.mut(s => s.counter++)
 
+    incrementCounter()
+    expect(state.counter).toEqual(2)
+});
 
 test('example car store', async () => {
     interface Car {
