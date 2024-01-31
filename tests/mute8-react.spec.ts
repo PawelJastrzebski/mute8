@@ -1,7 +1,7 @@
-import { newState } from "../packages/mute8-react/mute8-react"
+import { newStore } from "../packages/mute8-react/mute8-react"
 
 test('should init state', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "ok",
         }
@@ -9,12 +9,14 @@ test('should init state', () => {
 
     expect(state).toBeTruthy()
     expect(state.name).toEqual("ok")
-    expect(state.use).toBeTruthy()
-    expect(state.use.apply).toBeTruthy()
+    expect(state.react).toBeTruthy()
+    expect(state.react.use).toBeTruthy()
+    expect(state.react.useOne).toBeTruthy()
+    expect(state.react.useOne.apply).toBeTruthy()
 });
 
 test('should mutate (mutFn)', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "Tom"
         }
