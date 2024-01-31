@@ -6,7 +6,9 @@
 Project is in early stage of development
 
 ### Why?
-Inspired by recoil and redux to provide simple state managment solution
+Inspired by Recoil and Redux.
+
+Striving to offer a lightweight state management solution for applications that don't need the full capabilities of Redux.
 
 ## Instalation
 **JavaScript**
