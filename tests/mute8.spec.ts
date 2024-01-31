@@ -70,7 +70,7 @@ test('should subscribe 3', async () => {
     // two updates only once sub() event fired
     state.cars = [...state.cars, "Tesla"]
     state.cars = [...state.cars, "BMW"]
-    
+
     await wait(1);
     expect(subFired).toEqual(1)
     expect(state.cars).toEqual(["Tesla", "BMW"])
@@ -233,5 +233,5 @@ test('example car store', async () => {
             year: 2018
         }
     ])
-    
+
 });

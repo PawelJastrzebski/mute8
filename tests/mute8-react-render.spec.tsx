@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-
 import React from "react";
 import { render, renderWait } from "./utils"
 import { newState } from "../packages/mute8-react/mute8-react"
@@ -12,7 +11,7 @@ test('render simple counter', async () => {
             counter: 1
         }
     })
-    
+
     function TestComponent() {
         const [count,] = store.useOne('counter')
         return (<div id="count-value">{count}</div>)
