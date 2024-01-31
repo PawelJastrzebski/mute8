@@ -8,7 +8,8 @@
         "removeComments": true,
         "noLib": false,
         "esModuleInterop": true,
-        "noEmit": true
+        "noEmit": true,
+        "jsx": "react"
     },
     "include": [
         "packages/mute8-react/mute8-react.ts",

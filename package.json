@@ -23,17 +23,22 @@
   "author": "Paweł Jastrzębski",
   "license": "MIT",
   "peerDependencies": {
-    "react": "^18.2.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
     "@babel/preset-env": "^7.23.9",
+    "@babel/preset-react": "^7.23.3",
     "@babel/preset-typescript": "^7.23.3",
     "@types/jest": "^29.5.11",
+    "@types/react-test-renderer": "^18.0.7",
     "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
     "babel-jest": "^29.7.0",
-    "concurrently": "^8.2.2",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "concurrently": "^8.2.2",
     "ts-node": "^9.1.1",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"
