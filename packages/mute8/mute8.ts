@@ -14,11 +14,11 @@ const deepFreeze = <T extends Object>(object: T) => {
 const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 
-// private 
-export class StateCore<T, A> {
+// private
+class StoreCore<T, A> {
     private subs: Record<symbol, SubFn<T>> = {}
     private inner: Readonly<T>
-    private triger: NodeJS.Timeout
+    private trigger: NodeJS.Timeout
     private actions: A
     readonly actionsProxy: any
 
@@ -52,8 +52,8 @@ export class StateCore<T, A> {
 
         if (toJson(this.inner) !== toJson(newFinal)) {
             this.inner = newFinal;
-            clearTimeout(this.triger);
-            this.triger = setTimeout(this.notifySubs.bind(this), 0);
+            clearTimeout(this.trigger);
+            this.trigger = setTimeout(this.notifySubs.bind(this), 0);
         }
     }
 
@@ -76,13 +76,8 @@ export class StateCore<T, A> {
     }
 }
 
-// Actions Proxy 
-const buildActionsProxy = <T, A>(core: StateCore<T, A>) => (new Proxy({}, {
-    getOwnPropertyDescriptor: () => ({
-        configurable: false,
-        enumerable: false,
-        writable: false
-    }),
+// // Actions Proxy 
+const buildActionsProxy = <T, A>(core: StoreCore<T, A>) => (new Proxy({}, {
     get(_, action_name) {
         return core.getActionFn(action_name)
     },
@@ -99,35 +94,32 @@ export interface StoreProxy<T, A> {
 
 export interface ProxyExtension<T, A> {
     name: string,
-    init(core: StateCore<T, A>): object
+    init(core: StoreCore<T, A>): object
 }
 
-export const newStoreProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
-    const extenstion = ext?.init(core)
-    const extenstionName = ext?.name ?? null;
-    
-    return new Proxy(target, {
-        getOwnPropertyDescriptor: () => ({
-            configurable: false,
-            enumerable: true,
-        }),
+export const newStoreProxy = <T, A>(state: StoreDefiniton<T, A>, ext?: ProxyExtension<T, A>) => {
+    const core = new StoreCore(state.value, state.actions ?? {})
+    const extenstion = ext?.init(core as StoreCore<T, A>)
+    const extenstionName = ext?.name ?? null
+
+    return new Proxy(state.value, {
         get(_, prop) {
             if (prop === 'sub') return core.sub.bind(core)
             if (prop === 'snap') return core.snap.bind(core)
             if (prop === 'mut') return core.mutFn.bind(core)
-            if (prop === 'actions') return core.actionsProxy;
+            if (prop === 'actions') return core.actionsProxy
             if (extenstionName && prop === extenstionName) return extenstion
             return core.snap()[prop]
         },
         set(_, prop, value) {
             if (prop === 'mut') {
-                core.update(value);
+                core.update(value)
             } else {
                 core.updateValue(prop, value)
             }
             return true
         },
-    })
+    }) as any
 }
 
 // Public
@@ -145,7 +137,5 @@ export interface StoreDefiniton<T, A> {
     }
 }
 export const newStore = <T, A>(state: StoreDefiniton<T, A>) => {
-    const core = new StateCore(state.value, state.actions ?? {})
-    const proxy: StoreProxy<T, A> = newStoreProxy(state.value, core)
-    return proxy as Store<T, A>
+    return newStoreProxy(state) as Store<T, A>
 }

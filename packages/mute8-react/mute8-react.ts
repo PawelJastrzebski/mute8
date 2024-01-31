@@ -11,7 +11,7 @@ export type Store<T, A> = StoreMute8<T, A> & {
     react: ReactExtension<T>
 }
 
-export const newStore = <T extends Object, A>(state: StoreDefiniton<T, A>) => {
+export const newStore = <T extends Object, A>(store: StoreDefiniton<T, A>) => {
     const reactExtension:  ProxyExtension<T, A> = {
         name: "react",
         init(core) {
@@ -37,9 +37,7 @@ export const newStore = <T extends Object, A>(state: StoreDefiniton<T, A>) => {
         },
     }
 
-    const core = new mute8.StateCore(state.value, state.actions);
-    const proxy = mute8.newStoreProxy(state.value as any, core, reactExtension)
-    return proxy as Store<T, A>
+    return mute8.newStoreProxy(store as any, reactExtension) as Store<T, A>
 }
 
 export { SubFn, VoidFn, Sub } from "../mute8/mute8"
