@@ -1,7 +1,7 @@
-import { newState } from "../packages/mute8-react/mute8-react"
+import { newStore } from "../packages/mute8-react/mute8-react"
 
 test('should init state', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "ok",
         }
@@ -14,7 +14,7 @@ test('should init state', () => {
 });
 
 test('should mutate (mutFn)', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "Tom"
         }

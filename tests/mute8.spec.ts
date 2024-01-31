@@ -1,53 +1,53 @@
-import { newState } from "../packages/mute8/mute8"
+import { newStore } from "../packages/mute8/mute8"
 import { wait } from "./utils"
 
 test('should init state', () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "ok"
         }
     })
 
-    expect(state).toBeTruthy()
-    expect(state.name).toEqual("ok")
+    expect(store).toBeTruthy()
+    expect(store.name).toEqual("ok")
 });
 
 test('should get state snapshot', () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "Tom"
         }
     })
 
-    expect(state.snap()).toEqual({ name: "Tom" })
-    expect(state.name).toEqual("Tom")
+    expect(store.snap()).toEqual({ name: "Tom" })
+    expect(store.name).toEqual("Tom")
 });
 
 test('should subscribe', () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "Sub"
         }
     })
 
-    const sub = state.sub((v) => console.log(v));
+    const sub = store.sub((v) => console.log(v));
     expect(sub["destroy"]).toBeTruthy();
     sub.destroy();
 });
 
 test('should subscribe 2', async () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "Sub"
         }
     })
 
     let subFired = 0;
-    const sub = state.sub((v) => {
+    const sub = store.sub((v) => {
         subFired++;
         expect(v.name).toEqual("Amy")
     });
-    state.mut = {
+    store.mut = {
         name: "Amy"
     }
 
@@ -58,7 +58,7 @@ test('should subscribe 2', async () => {
 });
 
 test('should subscribe 3', async () => {
-    let state = newState({
+    let state = newStore({
         value: {
             cars: [] as string[]
         }
@@ -78,17 +78,17 @@ test('should subscribe 3', async () => {
 });
 
 test('should subscribe - unsubscribe ', async () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "Sub"
         }
     })
 
     let subFired = 0;
-    const sub = state.sub((v) => subFired++);
+    const sub = store.sub((v) => subFired++);
     sub.destroy();
 
-    state.mut = {
+    store.mut = {
         name: "Amy"
     }
     await wait(1);
@@ -97,21 +97,21 @@ test('should subscribe - unsubscribe ', async () => {
 });
 
 test('should mutate (set)', () => {
-    const state = newState({
+    const store = newStore({
         value: {
             name: "Tom"
         }
     })
 
-    expect(state.name).toEqual("Tom")
-    state.mut = {
+    expect(store.name).toEqual("Tom")
+    store.mut = {
         name: "Amy"
     }
-    expect(state.name).toEqual("Amy")
+    expect(store.name).toEqual("Amy")
 });
 
 test('should mutate (mutFn)', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "Tom"
         }
@@ -123,7 +123,7 @@ test('should mutate (mutFn)', () => {
 });
 
 test('should mutate prop', () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "Tom"
         }
@@ -136,7 +136,7 @@ test('should mutate prop', () => {
 
 
 test('should define action', async () => {
-    const state = newState({
+    const state = newStore({
         value: {
             name: "Sub"
         },
@@ -162,7 +162,7 @@ test('should define action', async () => {
 });
 
 test('example of functional action', async () => {
-    const state = newState({
+    const state = newStore({
         value: {
             counter: 1
         }
@@ -181,7 +181,7 @@ test('example car store', async () => {
         year: number
     }
 
-    const state = newState({
+    const store = newStore({
         value: {
             cars: [] as Car[]
         },
@@ -195,21 +195,21 @@ test('example car store', async () => {
         }
     })
 
-    await state.actions.addCar({
+    await store.actions.addCar({
         id: 1,
         brand: "Test",
         model: "3",
         year: 2022
     });
 
-    await state.actions.addCar({
+    await store.actions.addCar({
         id: 2,
         brand: "Test",
         model: "X",
         year: 2018
     });
 
-    expect(state.cars).toEqual([
+    expect(store.cars).toEqual([
         {
             id: 1,
             brand: "Test",
@@ -224,8 +224,8 @@ test('example car store', async () => {
         }
     ])
 
-    await state.actions.removeCar(1);
-    expect(state.cars).toEqual([
+    await store.actions.removeCar(1);
+    expect(store.cars).toEqual([
         {
             id: 2,
             brand: "Test",

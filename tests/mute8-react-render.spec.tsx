@@ -3,10 +3,10 @@
  */
 import React from "react";
 import { render, renderWait } from "./utils"
-import { newState } from "../packages/mute8-react/mute8-react"
+import { newStore } from "../packages/mute8-react/mute8-react"
 
 test('render simple counter', async () => {
-    const store = newState({
+    const store = newStore({
         value: {
             counter: 1
         }

@@ -23,10 +23,10 @@ For full examples go to `examples` directory
 
 #### Import
 ```ts
-import { newState } from 'mute8-react'
+import { newStore } from 'mute8-react'
 ```
 
-#### Create new state
+#### Create new store
 ```ts
 interface Car {
     id: number,
@@ -35,7 +35,7 @@ interface Car {
     year: number
 }
 
-const state = newState({
+const store = newStore({
     value: {
         cars: [] as Car[]
     },
@@ -52,14 +52,14 @@ const state = newState({
 
 #### Update state
 ```ts
-await state.actions.addCar({
+await store.actions.addCar({
     id: 1,
     brand: "Tesla",
     model: "3",
     year: 2022
 });
 
-await state.actions.addCar({
+await store.actions.addCar({
     id: 2,
     brand: "Porsche",
     model: "911",
@@ -70,9 +70,9 @@ await state.actions.addCar({
 
 ```tsx 
 function CarStore() {
-  const [cars,] = state.useOne('cars')
+  const [cars,] = store.useOne('cars')
   const carsList = cars.map(car => (
-    <li key={car.id} onClick={() => state.actions.removeCar(car.id)}>
+    <li key={car.id} onClick={() => store.actions.removeCar(car.id)}>
       {car.brand} {car.model} | {car.year}
     </li>
   ))
@@ -97,7 +97,7 @@ function randomNumber(min: number, max: number) {
 function AddNew() {
   return (
     <button onClick={() => {
-      state.actions.addCar({
+      store.actions.addCar({
         id: randomNumber(100, 100_000),
         brand: "Tesla",
         model: "Cybertruck",

@@ -89,7 +89,7 @@ const buildActionsProxy = <T, A>(core: StateCore<T, A>) => (new Proxy({}, {
 }))
 
 // Proxy
-export interface StateProxy<T, A> {
+export interface StoreProxy<T, A> {
     snap(): T
     sub(fn: SubFn<T>): Sub
     set mut(v: Partial<T>)
@@ -101,7 +101,7 @@ export interface ProxyExtension<T, A> {
     get(core: StateCore<T, A>, prop: string | symbol): { value: any } | null;
 }
 
-export const newStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
+export const newStoreProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: ProxyExtension<T, A>) => {
     return new Proxy(target, {
         getOwnPropertyDescriptor: () => ({
             configurable: false,
@@ -130,21 +130,21 @@ export const newStateProxy = <T, A>(target: any, core: StateCore<T, A>, ext?: Pr
 }
 
 // Public
-export type State<T, A> = StateProxy<T, A> & T
+export type Store<T, A> = StoreProxy<T, A> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export interface Sub {
     destroy(): void
 }
 
 export type VoidFn = ((...args: any) => Promise<void>);
-export interface StateDefiniton<T, A> {
+export interface StoreDefiniton<T, A> {
     value: T & object & { actions?: never, snap?: never, sub?: never, mut?: never },
     actions?: A & ThisType<T & Readonly<A>> & {
         [key: string]: VoidFn
     }
 }
-export const newState = <T, A>(state: StateDefiniton<T, A>) => {
+export const newStore = <T, A>(state: StoreDefiniton<T, A>) => {
     const core = new StateCore(state.value, state.actions ?? {})
-    const proxy: StateProxy<T, A> = newStateProxy(state.value, core)
-    return proxy as State<T, A>
+    const proxy: StoreProxy<T, A> = newStoreProxy(state.value, core)
+    return proxy as Store<T, A>
 }

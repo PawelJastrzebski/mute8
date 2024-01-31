@@ -1,7 +1,7 @@
-import { newState } from 'mute8-react'
+import { newStore } from 'mute8-react'
 import './App.css'
 
-const state = newState({
+const store = newStore({
   value: {
     count: 0,
     count2: 0,
@@ -15,29 +15,29 @@ const state = newState({
 })
 
 setInterval(() => {
-  state.count = state.count + 100;
-  state.count = state.count + 100;
+  store.count = store.count + 100;
+  store.count = store.count + 100;
 }, 100)
 
 setInterval(() => {
-  state.count = state.count + 1;
-  state.count = Math.floor(state.count * 2)
+  store.count = store.count + 1;
+  store.count = Math.floor(store.count * 2)
 
-  state.count2 = state.count2 + 1000;
+  store.count2 = store.count2 + 1000;
 }, 100)
 
 setInterval(() => {
-  state.count = 0
-  state.count2 = 0
+  store.count = 0
+  store.count2 = 0
 }, 20_000)
 
 // state.sub((v) => console.log(v.count))
 
 function App() {
-  const [, setFull] = state.use();
-  const [count,] = state.useOne('count')
-  const [count2, setCount2] = state.useOne("count2")
-  const [name, setName] = state.useOne("appName")
+  const [, setFull] = store.use();
+  const [count,] = store.useOne('count')
+  const [count2, setCount2] = store.useOne("count2")
+  const [name, setName] = store.useOne("appName")
 
   return (
     <>
@@ -47,14 +47,14 @@ function App() {
         <button onClick={() => setCount2(count2 + 1)}>
           count2 react hook {count2}
         </button>
-        <button onClick={() => state.actions.incrementCounter2(1)}>
+        <button onClick={() => store.actions.incrementCounter2(1)}>
           count2 mute8 action {count2}
         </button>
         <br />
         <br />
         <div style={{ display: "flex", justifyContent: "center"}}>
           <div>App Name (direct update) <br />
-            <input value={name} onChange={(e) => state.appName = e.target.value} type='text'></input>
+            <input value={name} onChange={(e) => store.appName = e.target.value} type='text'></input>
           </div>
           <div>
             App Name (React hook) <br />
