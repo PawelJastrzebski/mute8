@@ -1,5 +1,4 @@
 import { newStore } from 'mute8-react'
-import './App.css'
 
 function randomNumber(min: number, max: number) {
   return Math.round(Math.random() * (max - min) + min);

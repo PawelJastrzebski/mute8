@@ -8,7 +8,7 @@ const assign = O.assign;
 const deepFreeze = <T extends Object>(object: T) => {
     for (const name of O.keys(object)) {
         const value = object[name];
-        if (typeof value === "object") {
+        if (!!value && typeof value === "object") {
             deepFreeze(value);
         }
     }

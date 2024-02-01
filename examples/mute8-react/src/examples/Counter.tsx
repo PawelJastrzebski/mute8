@@ -1,5 +1,4 @@
 import { newStore } from 'mute8-react'
-import './App.css'
 
 const store = newStore({
   value: {
@@ -26,14 +25,9 @@ setInterval(() => {
   store.count2 = store.count2 + 1000;
 }, 100)
 
-setInterval(() => {
-  store.count = 0
-  store.count2 = 0
-}, 20_000)
-
 // state.sub((v) => console.log(v.count))
 
-function App() {
+function Couter() {
   const [, setFull] = store.react.use();
   const [count,] = store.react.useOne('count')
   const [count2, setCount2] = store.react.useOne("count2")
@@ -76,4 +70,4 @@ function App() {
   )
 }
 
-export default App
+export default Couter
