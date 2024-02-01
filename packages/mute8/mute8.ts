@@ -12,7 +12,6 @@ const deepFreeze = <T extends Object>(object: T) => {
             deepFreeze(value);
         }
     }
-
     return freeze(object) as Readonly<T>
 }
 
@@ -67,7 +66,7 @@ class StoreCore<T, A, AA> {
 
     /** update() */
     u(newState: Partial<T>): void {
-        const newFinal = deepFreeze(assign(assign({}, this.i), newState));
+        const newFinal = deepFreeze(assign(deepClone(this.i), newState));
 
         if (toJson(this.i) !== toJson(newFinal)) {
             this.i = newFinal;
@@ -102,7 +101,7 @@ class StoreCore<T, A, AA> {
     }
 }
 
-// // Actions Proxy 
+// Actions Proxy
 const buildActionsProxy = (fn: (action_name: string | symbol) => Function) => (
     new Proxy({}, {
         get(_, action_name) { return fn(action_name) },
@@ -120,7 +119,6 @@ export interface StoreProxy<T, A, AA> extends SmalProxy<T, A> {
     sub(fn: SubFn<T>): Sub
     async: Readonly<AA>
 }
-
 export interface ProxyExtension<T, A, AA> {
     name: string,
     init(core: StoreCore<T, A, AA>): object

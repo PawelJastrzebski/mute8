@@ -79,6 +79,32 @@ describe("Unit mute8", () => {
         sub.destroy();
     });
 
+    test('Subscribe multi', async () => {
+        let store = newStore({
+            value: {
+                update: 0
+            }
+        });
+
+        let subFired = 0;
+        const sub1 = store.sub((v) => subFired++);
+        const sub2 = store.sub((v) => subFired++);
+
+        store.update = 1
+        await wait(1);
+        expect(subFired).toEqual(2)
+        sub1.destroy();
+
+        store.update = 2
+        await wait(1);
+        expect(subFired).toEqual(3)
+        sub2.destroy();
+
+        store.update = 3
+        await wait(1);
+        expect(subFired).toEqual(3)
+    });
+
     test('Subscribe/Unsubscribe ', async () => {
         const store = newStore({
             value: {
