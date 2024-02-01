@@ -136,16 +136,13 @@ table {
   width: 100%;
   border-collapse: collapse;
   border: none;
-  border-radius: 20px;
-  font-family: sans-serif;
+  border-radius: 10px;
   font-size: .95rem;
-  color: white;
-  letter-spacing: 1px;
   max-width: 1200px;
   margin: 0 auto;
   background-color: #292929;
 }
 
 table th {
-  height: 50px;
+  height: 60px;
 }
