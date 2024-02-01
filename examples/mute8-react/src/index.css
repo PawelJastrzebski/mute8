@@ -8,6 +8,7 @@
   background-color: rgb(31, 31, 31);
 
   --color: #FF004C;
+  --border-radious: 15px;
 }
 
 * {
@@ -16,7 +17,7 @@
 
 a {
   font-weight: 500;
-  color: #FF004C;
+  color: var(--color);
   text-decoration: inherit;
 }
 a:hover {
@@ -56,7 +57,7 @@ button:hover {
 input {
   padding: 10px;
   margin: 10px;
-  border-radius: 10px;
+  border-radius: var(--border-radious);
   font-family: inherit;
   font-size: .9em;
   font-weight: 500;
@@ -97,7 +98,6 @@ li {
   padding: 12px 20px;
   min-width: 100px;
   margin: 5px;
-  border-radius: 8px;
   cursor: pointer;
   background-color: rgb(255, 255, 255);
   border: 3px solid transparent;
@@ -118,8 +118,9 @@ li {
   background: url("https://raw.githubusercontent.com/PawelJastrzebski/mute8/main/doc/mut8.svg") center no-repeat;
   background-size: contain;
   background-color: white;
-  border-radius: 15px;
-  opacity: .98;
+  border-radius: var(--border-radious);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 #router {
@@ -127,6 +128,13 @@ li {
   text-align: center;
   padding: 20px;
   overflow: auto;
+}
+
+.card {
+  margin: 0 auto;
+  max-width: 1200px;
+  background-color: #292929;
+  border-radius: var(--border-radious);
 }
 
 /* Async Example */
@@ -140,7 +148,6 @@ table {
   font-size: .95rem;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #292929;
 }
 
 table th {

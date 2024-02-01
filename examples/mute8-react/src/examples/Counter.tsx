@@ -36,7 +36,7 @@ function Couter() {
   return (
     <>
       <h1>{name}</h1>
-      <div className="card">
+      <div style={{padding: "20px 0"}} className="card">
         <h4>count is {count}</h4>
         <button onClick={() => setCount2(count2 + 1)}>
           count2 react hook {count2}

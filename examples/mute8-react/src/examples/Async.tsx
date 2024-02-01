@@ -28,6 +28,10 @@ const store = newStore({
   },
   async: {
     async fetchUsers() {
+      if(this.snap().state === 'pending') {
+        return
+      }
+
       this.mut(v => {
         v.state = "pending"
         v.users = []
@@ -85,7 +89,7 @@ function Async() {
         </span>
       </div>
       <div>
-        <table cellSpacing="0" cellPadding="0">
+        <table className='card' cellSpacing="0" cellPadding="0">
           <thead>
             <tr>
               <th scope="col">Id</th>

@@ -65,11 +65,15 @@ function CarStore() {
   return (
     <>
       <h1>Car store</h1>
-      <ul style={{ maxWidth: 400, margin: "0 auto" }}>
-        {carsList}
-      </ul>
-      <AddNew />
+      <div style={{ padding: "20px 0" }} className='card'>
+        <h4>List</h4>
+        <ul style={{ maxWidth: 400, margin: "0 auto" }}>
+          {carsList}
+        </ul>
+        <AddNew />
+      </div>
     </>
+
   )
 }
 
