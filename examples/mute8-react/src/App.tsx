@@ -6,9 +6,9 @@ const store = newStore({
     count: 0,
     count2: 0,
     appName: "Vite + React + mute8"
-  }, 
+  },
   actions: {
-    async incrementCounter2(value: number) {
+    incrementCounter2(value: number) {
       this.count2 = this.count2 + value;
     }
   }
@@ -52,7 +52,7 @@ function App() {
         </button>
         <br />
         <br />
-        <div style={{ display: "flex", justifyContent: "center"}}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
           <div>App Name (direct update) <br />
             <input value={name} onChange={(e) => store.appName = e.target.value} type='text'></input>
           </div>

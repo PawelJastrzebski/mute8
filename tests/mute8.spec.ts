@@ -141,24 +141,13 @@ test('should define action', async () => {
             name: "Sub"
         },
         actions: {
-            async setName(name: string) {
-                this.name = name
-            },
-            async setNameAsync(name: string, wait_ms: number) {
-                await wait(wait_ms)
-                this.name = name
-            },
+            setName(name: string) {
+                this.name = name;
+            }
         }
     })
-    await state.actions.setName("Action");
+    state.actions.setName("Action");
     expect(state.name).toEqual("Action")
-
-    await state.actions.setNameAsync("ActionAsync", 10);
-    expect(state.name).toEqual("ActionAsync")
-
-    state.actions.setNameAsync("ActionAsync Not Awaited", 5);
-    await wait(10)
-    expect(state.name).toEqual("ActionAsync Not Awaited")
 });
 
 test('example of functional action', async () => {
@@ -186,23 +175,22 @@ test('example car store', async () => {
             cars: [] as Car[]
         },
         actions: {
-            async addCar(car: Car) {
+            addCar(car: Car) {
                 this.cars.push(car)
             },
-            async removeCar(id: number) {
+            removeCar(id: number) {
                 this.cars = this.cars.filter(c => c.id != id)
             },
-        }
+        },
     })
 
-    await store.actions.addCar({
+    store.actions.addCar({
         id: 1,
         brand: "Test",
         model: "3",
         year: 2022
     });
-
-    await store.actions.addCar({
+    store.actions.addCar({
         id: 2,
         brand: "Test",
         model: "X",
@@ -224,7 +212,7 @@ test('example car store', async () => {
         }
     ])
 
-    await store.actions.removeCar(1);
+    store.actions.removeCar(1);
     expect(store.cars).toEqual([
         {
             id: 2,
@@ -235,3 +223,41 @@ test('example car store', async () => {
     ])
 
 });
+
+test('async actions', async () => {
+    const store = newStore({
+        value: {
+            fetchCount: 0,
+            state: "done" as "done" | "pending"
+        },
+        actions: {
+            inc() {
+                this.fetchCount++
+            }
+        },
+        async: {
+            async other() {
+                await wait(10)
+                this.actions.inc();
+
+            },
+            async fetch() {
+                const snap = this.snap()
+                await wait(10)
+                this.mut(v => v.fetchCount++);
+            },
+        }
+    })
+    store.async.fetch().then()
+    store.async.fetch().then()
+    store.async.other().then()
+    await wait(10)
+    expect(store.fetchCount).toEqual(3)
+
+    await store.async.fetch()
+    expect(store.fetchCount).toEqual(4)
+    await store.async.fetch()
+    expect(store.fetchCount).toEqual(5)
+    await store.async.other()
+    expect(store.fetchCount).toEqual(6)
+})
