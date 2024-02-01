@@ -42,10 +42,10 @@ const store = newStore({
         cars: [] as Car[]
     },
     actions: {
-        async addCar(car: Car) {
+        addCar(car: Car) {
             this.cars.push(car)
         },
-        async removeCar(id: number) {
+        removeCar(id: number) {
             this.cars = this.cars.filter(c => c.id != id)
         },
     }
@@ -54,14 +54,14 @@ const store = newStore({
 
 #### Update state
 ```ts
-await store.actions.addCar({
+store.actions.addCar({
     id: 1,
     brand: "Tesla",
     model: "3",
     year: 2022
 });
 
-await store.actions.addCar({
+store.actions.addCar({
     id: 2,
     brand: "Porsche",
     model: "911",
@@ -111,6 +111,10 @@ function AddNew() {
   )
 }
 ```
+
+## Use with TypeScript 💙
+
+To keep packages lightweight, we do not provide type validation at runtime.
 
 ## Authors
 - Paweł Jastrzębski 🇵🇱

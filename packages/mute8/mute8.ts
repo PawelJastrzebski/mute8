@@ -1,6 +1,10 @@
 // Utils
 const O = Object;
 const J = JSON;
+const toJson = J.stringify
+const deepClone = (obj: object) => J.parse(toJson(obj))
+const freeze = O.freeze
+const assign = O.assign;
 const deepFreeze = <T extends Object>(object: T) => {
     for (const name of O.keys(object)) {
         const value = object[name];
@@ -9,133 +13,155 @@ const deepFreeze = <T extends Object>(object: T) => {
         }
     }
 
-    return O.freeze(object) as Readonly<T>
+    return freeze(object) as Readonly<T>
 }
-const toJson = J.stringify
-const deepClone = (obj: object) => J.parse(toJson(obj))
 
-// private
-class StoreCore<T, A> {
-    private subs: Record<symbol, SubFn<T>> = {}
-    private inner: Readonly<T>
-    private trigger: NodeJS.Timeout
-    private actions: A
-    readonly actionsProxy: any
+class StoreCore<T, A, AA> {
+    private s: Record<symbol, SubFn<T>> = {} // subscription container
+    private i: Readonly<T> // current state
+    private t: NodeJS.Timeout // sub triger
+    private a: A // actions
+    readonly ap: any // actions proxy
+    private aa: AA // async action
+    readonly aap: any // async action proxy
+    readonly sp: SmalProxy<T, A>; // small proxy
 
-    constructor(inner: T, actions: A) {
-        this.inner = deepFreeze(O.assign({}, inner))
-        this.actions = O.freeze(actions);
-        this.actionsProxy = O.freeze(buildActionsProxy(this))
+    constructor(inner: T, actions: A, aactions: AA) {
+        this.i = deepFreeze(assign({}, inner))
+        this.a = freeze(actions);
+        this.ap = freeze(buildActionsProxy((n) => this.aFn(n)))
+        this.aa = freeze(aactions);
+        this.aap = freeze(buildActionsProxy((n) => this.aaFn(n)))
+        // init small proxy
+        const core = this;
+        this.sp = {
+            actions: this.ap,
+            snap() { return core.snap() },
+            get mut() { return core.mutFn.bind(core) },
+            set mut(v: Partial<T>) { core.u(v) }
+        } as any
     }
 
-    snap(): Readonly<T> {
-        return this.inner
+    /** getAsyncActionFunction() */
+    aaFn(action_name: string | symbol): Function {
+        const action_fn = this.aa[action_name]
+        return action_fn.bind(this.sp)
     }
 
-    getActionFn(action_name: string | symbol): Function {
-        const action_fn = this.actions[action_name]
-        return async (...args: any[]) => {
+    /** getActionFunction() */
+    aFn(action_name: string | symbol): Function {
+        const action_fn = this.a[action_name]
+        return (...args: any[]) => {
             const state = deepClone(this.snap())
-            await action_fn.bind(state)(...args)
-            this.update(state)
+            action_fn.bind(state)(...args)
+            this.u(state)
         }
     }
 
     mutFn(fn: (v: T) => void): void {
         const state = deepClone(this.snap())
         fn(state)
-        this.update(state)
+        this.u(state)
     }
 
-    update(newState: Partial<T>): void {
-        const newFinal = deepFreeze(O.assign(O.assign({}, this.inner), newState));
+    /** update() */
+    u(newState: Partial<T>): void {
+        const newFinal = deepFreeze(assign(assign({}, this.i), newState));
 
-        if (toJson(this.inner) !== toJson(newFinal)) {
-            this.inner = newFinal;
-            clearTimeout(this.trigger);
-            this.trigger = setTimeout(this.notifySubs.bind(this), 0);
+        if (toJson(this.i) !== toJson(newFinal)) {
+            this.i = newFinal;
+            clearTimeout(this.t);
+            this.t = setTimeout(this.ns.bind(this), 0);
         }
     }
 
-    updateValue(key: any, value: any): void {
-        this.update({ [key]: value } as any)
+    /** updateValue() */
+    uv(key: any, value: any): void {
+        this.u({ [key]: value } as any)
     }
 
-    notifySubs(): void {
-        for (const symbol of O.getOwnPropertySymbols(this.subs)) {
-            this.subs[symbol](this.inner)
+    /** notifySubs() */
+    ns(): void {
+        for (const symbol of O.getOwnPropertySymbols(this.s)) {
+            this.s[symbol](this.i)
         }
+    }
+
+    snap(): Readonly<T> {
+        return this.i
     }
 
     sub(fn: SubFn<T>): Sub {
         const id = Symbol()
-        this.subs[id] = fn
+        this.s[id] = fn
         return {
-            destroy: () => delete this.subs[id]
+            destroy: () => delete this.s[id]
         }
     }
 }
 
 // // Actions Proxy 
-const buildActionsProxy = <T, A>(core: StoreCore<T, A>) => (new Proxy({}, {
-    get(_, action_name) {
-        return core.getActionFn(action_name)
-    },
-}))
+const buildActionsProxy = (fn: (action_name: string | symbol) => Function) => (
+    new Proxy({}, {
+        get(_, action_name) { return fn(action_name) },
+    })
+)
 
 // Proxy
-export interface StoreProxy<T, A> {
+interface SmalProxy<T, A> {
     snap(): T
-    sub(fn: SubFn<T>): Sub
     set mut(v: Partial<T>)
     get mut(): (fn: (v: T) => void) => void
-    actions: A
+    actions: Readonly<A>
+}
+export interface StoreProxy<T, A, AA> extends SmalProxy<T, A> {
+    sub(fn: SubFn<T>): Sub
+    async: Readonly<AA>
 }
 
-export interface ProxyExtension<T, A> {
+export interface ProxyExtension<T, A, AA> {
     name: string,
-    init(core: StoreCore<T, A>): object
+    init(core: StoreCore<T, A, AA>): object
 }
 
-export const newStoreProxy = <T, A>(state: StoreDefiniton<T, A>, ext?: ProxyExtension<T, A>) => {
-    const core = new StoreCore(state.value, state.actions ?? {})
-    const extenstion = ext?.init(core as StoreCore<T, A>)
-    const extenstionName = ext?.name ?? null
+export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
+    const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {})
+    const extension = !ext ? {} : { [ext.name]: ext.init(core as any) } as {}
+    const bigProxy = assign({
+        sub: core.sub.bind(core),
+        async: core.aap,
+    }, assign(extension, core.sp))
 
-    return new Proxy(state.value, {
-        get(_, prop) {
-            if (prop === 'sub') return core.sub.bind(core)
-            if (prop === 'snap') return core.snap.bind(core)
-            if (prop === 'mut') return core.mutFn.bind(core)
-            if (prop === 'actions') return core.actionsProxy
-            if (extenstionName && prop === extenstionName) return extenstion
+    return new Proxy({}, {
+        get(t, prop) {
+            const p = bigProxy[prop];
+            if (!!p) return p
             return core.snap()[prop]
         },
         set(_, prop, value) {
             if (prop === 'mut') {
-                core.update(value)
+                core.u(value)
             } else {
-                core.updateValue(prop, value)
+                core.uv(prop, value)
             }
             return true
         },
     }) as any
 }
 
+type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
-export type Store<T, A> = StoreProxy<T, A> & T
+export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
-export interface Sub {
-    destroy(): void
-}
+export type Sub = { destroy(): void }
 
-export type VoidFn = ((...args: any) => Promise<void>);
-export interface StoreDefiniton<T, A> {
-    value: T & object & { actions?: never, snap?: never, sub?: never, mut?: never },
-    actions?: A & ThisType<T & Readonly<A>> & {
-        [key: string]: VoidFn
-    }
+export type VoidFn = ((...args: any) => undefined)
+export type AsyncFn = ((...args: any) => Promise<void>);
+export interface StoreDefiniton<T, A, AA> {
+    value: T & object & ExcludeKeys,
+    actions?: A & ThisType<T> & Record<string, VoidFn>
+    async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
 }
-export const newStore = <T, A>(state: StoreDefiniton<T, A>) => {
-    return newStoreProxy(state) as Store<T, A>
+export const newStore = <T, A, AA>(state: StoreDefiniton<T, A, AA>) => {
+    return newStoreProxy(state) as Store<T, A, AA>
 }

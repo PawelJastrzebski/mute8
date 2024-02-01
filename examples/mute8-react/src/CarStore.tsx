@@ -17,23 +17,23 @@ const store = newStore({
     cars: [] as Car[]
   },
   actions: {
-    async addCar(car: Car) {
+    addCar(car: Car) {
       this.cars.push(car)
     },
-    async removeCar(id: number) {
+    removeCar(id: number) {
       this.cars = this.cars.filter(c => c.id != id)
     },
   }
 })
 
-await store.actions.addCar({
+store.actions.addCar({
   id: 1,
   brand: "Tesla",
   model: "3",
   year: 2022
 });
 
-await store.actions.addCar({
+store.actions.addCar({
   id: 2,
   brand: "Porsche",
   model: "911",
@@ -66,7 +66,7 @@ function CarStore() {
   return (
     <>
       <h1>Car store</h1>
-      <ul style={{maxWidth: 400, margin: "0 auto"}}>
+      <ul style={{ maxWidth: 400, margin: "0 auto" }}>
         {carsList}
       </ul>
       <AddNew />
