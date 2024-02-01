@@ -1,4 +1,5 @@
-export const wait = (time_ms: number) => new Promise((resolve, reject) => setTimeout(resolve, time_ms));
+export const wait = (time_ms: number) => new Promise((resolve, reject) => setTimeout(resolve, time_ms))
+export const random = (min: number, max: number) => Math.floor(Math.random() * (max - min) + min)
 
 // React (jsdom)
 import { createRoot } from 'react-dom/client';

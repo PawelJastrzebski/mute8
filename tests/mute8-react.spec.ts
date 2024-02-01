@@ -1,6 +1,6 @@
 import { newStore } from "../packages/mute8-react/mute8-react"
 
-test('should init state', () => {
+test('Init state', () => {
     const state = newStore({
         value: {
             name: "ok",
@@ -15,7 +15,7 @@ test('should init state', () => {
     expect(state.react.useOne.apply).toBeTruthy()
 });
 
-test('should mutate (mutFn)', () => {
+test('Mutate by mut()', () => {
     const state = newStore({
         value: {
             name: "Tom"
