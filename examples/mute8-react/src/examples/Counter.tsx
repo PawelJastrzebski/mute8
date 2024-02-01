@@ -4,7 +4,7 @@ const store = newStore({
   value: {
     count: 0,
     count2: 0,
-    appName: "Vite + React + mute8"
+    appName: "Vite + React + Mute8"
   },
   actions: {
     incrementCounter2(value: number) {

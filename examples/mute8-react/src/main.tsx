@@ -5,6 +5,7 @@ import { newStore } from 'mute8-react'
 
 import Couter from './examples/Counter.tsx'
 import CarStore from './examples/CarStore.tsx'
+import Async from './examples/Async.tsx'
 
 type Example = {
   name: string,
@@ -12,6 +13,10 @@ type Example = {
 }
 
 const examples: Record<string, Example> = {
+  async: {
+    name: "Async",
+    element: <Async />
+  },
   couter: {
     name: "Counter",
     element: <Couter />
@@ -25,7 +30,7 @@ const examples: Record<string, Example> = {
 type ExampleId = keyof typeof examples;
 const router = newStore({
   value: {
-    currentExample: "couter"
+    currentExample: "async"
   },
   actions: {
     openExample(example: ExampleId) {
