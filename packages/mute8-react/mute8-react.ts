@@ -17,7 +17,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
         init(core) {
             return {
                 use() {
-                    const [value, setValue] = useState(core.snap());
+                    const [value, setValue] = useState(core.s());
                     useEffect(() => {
                         const sub = core.sub((s) => setValue(s))
                         return () => sub.destroy()
@@ -26,7 +26,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                     return [value, (v: any) => core.u(v)]
                 },
                 useOne(property: keyof T) {
-                    const [value, setValue] = useState((core.snap() as any)[property]);
+                    const [value, setValue] = useState((core.s() as any)[property]);
                     useEffect(() => {
                         const sub = core.sub((s: any) => setValue(s[property]))
                         return () => sub.destroy()

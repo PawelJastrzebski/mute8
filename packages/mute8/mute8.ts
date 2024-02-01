@@ -17,7 +17,8 @@ const deepFreeze = <T extends Object>(object: T) => {
 }
 
 class StoreCore<T, A, AA> {
-    private s: Record<symbol, SubFn<T>> = {} // subscription container
+    private id: number = 0; // subscription id
+    private c: Record<number, SubFn<T>> = {} // subscription container
     private i: Readonly<T> // current state
     private t: NodeJS.Timeout // sub triger
     private a: A // actions
@@ -36,7 +37,7 @@ class StoreCore<T, A, AA> {
         const core = this;
         this.sp = {
             actions: this.ap,
-            snap() { return core.snap() },
+            snap() { return core.s() },
             get mut() { return core.mutFn.bind(core) },
             set mut(v: Partial<T>) { core.u(v) }
         } as any
@@ -52,14 +53,14 @@ class StoreCore<T, A, AA> {
     aFn(action_name: string | symbol): Function {
         const action_fn = this.a[action_name]
         return (...args: any[]) => {
-            const state = deepClone(this.snap())
+            const state = deepClone(this.s())
             action_fn.bind(state)(...args)
             this.u(state)
         }
     }
 
     mutFn(fn: (v: T) => void): void {
-        const state = deepClone(this.snap())
+        const state = deepClone(this.s())
         fn(state)
         this.u(state)
     }
@@ -82,20 +83,21 @@ class StoreCore<T, A, AA> {
 
     /** notifySubs() */
     ns(): void {
-        for (const symbol of O.getOwnPropertySymbols(this.s)) {
-            this.s[symbol](this.i)
+        for (const id of O.keys(this.c)) {
+            this.c[id](this.i)
         }
     }
 
-    snap(): Readonly<T> {
+    /** snap() */
+    s(): Readonly<T> {
         return this.i
     }
 
     sub(fn: SubFn<T>): Sub {
-        const id = Symbol()
-        this.s[id] = fn
+        const id = this.id++
+        this.c[id] = fn
         return {
-            destroy: () => delete this.s[id]
+            destroy: () => delete this.c[id]
         }
     }
 }
@@ -136,7 +138,7 @@ export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: P
         get(t, prop) {
             const p = bigProxy[prop];
             if (!!p) return p
-            return core.snap()[prop]
+            return core.s()[prop]
         },
         set(_, prop, value) {
             if (prop === 'mut') {
