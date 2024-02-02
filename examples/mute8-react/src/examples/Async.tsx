@@ -1,4 +1,4 @@
-import { newStore } from 'mute8-react'
+import { newStore, Plugin } from 'mute8-react'
 
 interface User {
   id: number,
@@ -7,6 +7,26 @@ interface User {
   first_name: string
   last_name: string
 }
+
+const defaultPlugin: Plugin = {
+  BInit: (v) => {
+    console.log("init", v)
+
+    const state = localStorage.getItem("value")
+    if (!!state) {
+      return JSON.parse(state)
+    }
+
+
+    return v
+  },
+  BUpdate: (v) => v,
+  AChange: (v1, v2) => {
+    console.log("old", v1, "new", v2)
+    localStorage.setItem("value", JSON.stringify(v2))
+  }
+}
+
 
 type FetchState = "init" | "pending" | "ready" | "error"
 const store = newStore({
@@ -28,7 +48,7 @@ const store = newStore({
   },
   async: {
     async fetchUsers() {
-      if(this.snap().state === 'pending') {
+      if (this.snap().state === 'pending') {
         return
       }
 
@@ -46,7 +66,8 @@ const store = newStore({
         this.actions.setFetchState("error")
       }
     }
-  }
+  },
+  plugin: () => defaultPlugin
 })
 
 const stateInfo = (state: FetchState) => {
@@ -110,7 +131,7 @@ function Async() {
           <tfoot>
             <tr>
               <td colSpan={5}>
-                <h4 style={{ margin: "10px 0" }} >Test API <a href='https://reqres.in/'>https://reqres.in/</a></h4>
+                <h4 style={{ margin: "10px 0" }} >Test API <a href='https://reqres.in/'>https://reqres.in</a></h4>
               </td>
             </tr>
           </tfoot>
