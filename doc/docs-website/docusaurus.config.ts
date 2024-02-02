@@ -104,6 +104,10 @@ const config: Config = {
           position: 'right',
           className: 'header-github-link',
         },
+        // {
+        //   type: 'search',
+        //   position: 'right',
+        // },
         //  {to: '/blog', label: 'Blog', position: 'right'},
       ],
     },
