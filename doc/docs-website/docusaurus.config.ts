@@ -61,21 +61,50 @@ const config: Config = {
       title: "",
       logo: {
         alt: 'mute8 Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo-light.svg',
+        srcDark: 'img/logo-dark.svg'
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          to: '/',
+          label: 'Home',
           position: 'left',
-          label: 'Tutorial',
+          activeBaseRegex: '/home',
         },
-        // {to: '/blog', label: 'Blog', position: 'left'},
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
-          position: 'right',
+          type: 'docSidebar',
+          sidebarId: 'home',
+          position: 'left',
+          label: 'Documentation',
         },
+        {
+          type: 'dropdown',
+          label: 'npm',
+          position: 'right',
+          items: [
+            {
+              type: 'doc',
+              label: 'mute8',
+              docId: 'mute8/intro',
+            },
+            {
+              type: 'doc',
+              label: 'mute8-react',
+              docId: 'mute8-react/intro',
+            },
+            {
+              type: 'doc',
+              label: 'mute8-plugins',
+              docId: 'mute8-plugins/intro',
+            },
+          ],
+        },
+        {
+          href: 'https://github.com/PawelJastrzebski/mute8',
+          position: 'right',
+          className: 'header-github-link',
+        },
+        //  {to: '/blog', label: 'Blog', position: 'right'},
       ],
     },
     footer: {
