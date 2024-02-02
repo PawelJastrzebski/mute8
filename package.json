@@ -12,6 +12,7 @@
     "build": "concurrently -n mute8,mute8-react \"npm run build:mute8\" \"npm run build:mute8-react\" ",
     "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",
     "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react",
+    "build:mute8-plugins": "cd ./packages/mute8-plugins && npx tsup ./mute8-plugins.ts --format cjs,esm --dts --minify --external react",
     "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react",

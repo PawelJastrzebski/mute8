@@ -1,4 +1,5 @@
-import { newStore, Plugin } from 'mute8-react'
+import { newStore } from 'mute8-react'
+import { CombinePlugins, LocalStoragePlugin } from 'mute8-plugins'
 
 interface User {
   id: number,
@@ -7,26 +8,6 @@ interface User {
   first_name: string
   last_name: string
 }
-
-const defaultPlugin: Plugin = {
-  BInit: (v) => {
-    console.log("init", v)
-
-    const state = localStorage.getItem("value")
-    if (!!state) {
-      return JSON.parse(state)
-    }
-
-
-    return v
-  },
-  BUpdate: (v) => v,
-  AChange: (v1, v2) => {
-    console.log("old", v1, "new", v2)
-    localStorage.setItem("value", JSON.stringify(v2))
-  }
-}
-
 
 type FetchState = "init" | "pending" | "ready" | "error"
 const store = newStore({
@@ -67,7 +48,7 @@ const store = newStore({
       }
     }
   },
-  plugin: () => defaultPlugin
+  plugin: CombinePlugins(LocalStoragePlugin.new("async_users"))
 })
 
 const stateInfo = (state: FetchState) => {

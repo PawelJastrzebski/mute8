@@ -1,0 +1,25 @@
+{
+    "name": "mute8-plugins",
+    "description": "Plugins for mute8",
+    "version": "0.0.0-alpha.4",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8-plugins.cjs",
+    "module": "dist/mute8-plugins.js",
+    "types": "dist/mute8-plugins.d.ts",
+    "scripts": {},
+    "keywords": [
+        "React",
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable",
+        "Plugin"
+    ]
+}

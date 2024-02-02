@@ -291,7 +291,6 @@ test('Async actions', async () => {
     expect(store.fetchCount).toEqual(6)
 })
 
-
 describe("Plugin", () => {
 
     test('Empty Plugin', async () => {

@@ -5,19 +5,13 @@ const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;
-// const deepFreeze = <T extends Object>(object: T) => {
-//     for (const name of O.keys(object)) {
-//         const value = object[name];
-//         if (!!value && typeof value === "object") {
-//             deepFreeze(value);
-//         }
-//     }
-//     return freeze(object) as Readonly<T>
-// }
 
 export interface Plugin<T extends Object = {}> {
+    /** BeforeInit() */
     BInit(initState: T): T
+    /** BeforeUpdate() */
     BUpdate(newState: T): T
+    /** AfterChange() */
     AChange(oldState: Readonly<T>, newState: T): void
 }
 const defaultPlugin: () => Plugin = () => ({
@@ -167,6 +161,7 @@ export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: P
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
+export type PluginBuilder<T, A, AA> = (proxy: StoreProxy<T, A, AA>) => Plugin
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export type Sub = { destroy(): void }
@@ -177,7 +172,7 @@ export interface StoreDefiniton<T extends Object, A, AA> {
     value: T & object & ExcludeKeys
     actions?: A & ThisType<T> & Record<string, VoidFn>
     async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
-    plugin?: (proxy: StoreProxy<T, A, AA>) => Plugin
+    plugin?: PluginBuilder<T, A, AA>
 }
 export const newStore = <T, A, AA>(state: StoreDefiniton<T, A, AA>) => {
     return newStoreProxy(state) as Store<T, A, AA>

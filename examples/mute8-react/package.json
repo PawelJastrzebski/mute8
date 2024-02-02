@@ -13,6 +13,7 @@
     "node": ">=21.0.0"
   },
   "dependencies": {
+    "mute8-plugins": "file:../../packages/mute8-plugins",
     "mute8-react": "file:../../packages/mute8-react",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
