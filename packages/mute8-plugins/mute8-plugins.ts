@@ -7,14 +7,14 @@ export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilde
 
         return {
             BInit: (initState) => {
-                let final = initState as T;
+                let final = initState;
                 for (let plugin of initializedPlugins) {
                     final = plugin.BInit(final)
                 }
                 return final
             },
             BUpdate: (newState) => {
-                let final = newState as T;
+                let final = newState;
                 for (let plugin of initializedPlugins) {
                     final = plugin.BUpdate(final)
                 }
@@ -22,7 +22,7 @@ export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilde
             },
             AChange: (oldState, newState) => {
                 for (let plugin of initializedPlugins) {
-                    plugin.AChange(oldState as T, newState as T)
+                    plugin.AChange(oldState, newState)
                 }
             }
         }
