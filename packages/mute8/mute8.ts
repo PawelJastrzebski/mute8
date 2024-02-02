@@ -21,10 +21,10 @@ class StoreCore<T, A, AA> {
     private i: Readonly<T> // current state
     private t: NodeJS.Timeout // sub triger
     private a: A // actions
-    readonly ap: any // actions proxy
+    private ap: any // actions proxy
     private aa: AA // async action
-    readonly aap: any // async action proxy
-    readonly sp: SmalProxy<T, A>; // small proxy
+    private aap: any // async action proxy
+    readonly bp: StoreProxy<T, A, AA>; // big proxy
 
     constructor(inner: T, actions: A, aactions: AA) {
         this.i = deepFreeze(assign({}, inner))
@@ -32,20 +32,24 @@ class StoreCore<T, A, AA> {
         this.ap = freeze(buildActionsProxy((n) => this.aFn(n)))
         this.aa = freeze(aactions);
         this.aap = freeze(buildActionsProxy((n) => this.aaFn(n)))
-        // init small proxy
+        // init big proxy
         const core = this;
-        this.sp = {
+        this.bp = {
+            snap: core.s.bind(core),
+            sub: core.sub.bind(core),
+            async: core.aap,
             actions: this.ap,
-            snap() { return core.s() },
-            get mut() { return core.mutFn.bind(core) },
-            set mut(v: Partial<T>) { core.u(v) }
-        } as any
+            /** @ts-ignore */
+            set mut(v: Partial<T>) { core.u(v) },
+            /** @ts-ignore */
+            get mut() { return core.mutFn.bind(core) }
+        } 
     }
 
     /** getAsyncActionFunction() */
     aaFn(action_name: string | symbol): Function {
         const action_fn = this.aa[action_name]
-        return action_fn.bind(this.sp)
+        return action_fn.bind(this.bp)
     }
 
     /** getActionFunction() */
@@ -127,13 +131,10 @@ export interface ProxyExtension<T, A, AA> {
 export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
     const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {})
     const extension = !ext ? {} : { [ext.name]: ext.init(core as any) } as {}
-    const bigProxy = assign({
-        sub: core.sub.bind(core),
-        async: core.aap,
-    }, assign(extension, core.sp))
+    const bigProxy = assign(extension, core.bp)
 
     return new Proxy({}, {
-        get(t, prop) {
+        get(_, prop) {
             const p = bigProxy[prop];
             if (!!p) return p
             return core.s()[prop]
