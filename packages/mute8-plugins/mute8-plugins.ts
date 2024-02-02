@@ -1,21 +1,10 @@
 import { Plugin, PluginBuilder, StoreProxy } from "../mute8/mute8"
 
-// const deepFreeze = <T extends Object>(object: T) => {
-//     for (const name of O.keys(object)) {
-//         const value = object[name];
-//         if (!!value && typeof value === "object") {
-//             deepFreeze(value);
-//         }
-//     }
-//     return freeze(object) as Readonly<T>
-// }
-
-
 // CombinePlugins Util
 export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilder<T, A, AA>[]) => {
     return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
         const initializedPlugins = plugins.map(p => p(proxy as any)) as Plugin<T>[]
-        
+
         return {
             BInit: (initState) => {
                 let final = initState as T;
@@ -61,6 +50,63 @@ export const LocalStoragePlugin = {
                 },
                 BUpdate: (newState) => newState,
                 AChange: (_, newState) => { setItem(newState) }
+            }
+        }
+    }
+}
+
+// DevPlugin
+const deepFreeze = <T extends Object>(object: T) => {
+    for (const name of Object.keys(object)) {
+        const value = object[name];
+        if (!!value && typeof value === "object") {
+            deepFreeze(value);
+        }
+    }
+    return Object.freeze(object) as Readonly<T>
+}
+
+export type DevPluginOptions = {
+    logger: {
+        logInit: boolean,
+        logChange: boolean,
+    },
+    deepFreaze: boolean
+}
+const DevPluginOptionsDefault: DevPluginOptions = {
+    logger: { logChange: true, logInit: true },
+    deepFreaze: true
+}
+export const DevPlugin = {
+    new(label: string, options: DevPluginOptions = DevPluginOptionsDefault) {
+        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
+            return {
+                BInit: (initState) => {
+                    if (options.logger.logInit) {
+                        console.table({
+                            [`${label}-init`]: initState,
+                        })
+                    }
+
+                    if (options.deepFreaze) {
+                        return deepFreeze(initState)
+                    }
+                    return initState
+                },
+                BUpdate: (newState) => {
+                    if (options.deepFreaze) {
+                        return deepFreeze(newState)
+                    }
+                    return newState
+                },
+                AChange: (oldState, newState) => {
+                    if (options.logger.logChange) {
+                        console.table({
+                            [`${label}-old`]: oldState,
+                            [`${label}-new`]: newState
+                        })
+                    }
+                }
             }
         }
     }
