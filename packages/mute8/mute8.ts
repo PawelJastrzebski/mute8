@@ -137,6 +137,9 @@ export interface ProxyExtension<T, A, AA> {
     init(core: StoreCore<T, A, AA>): object
 }
 
+/**  
+* Use Only for internal ProxyExtension
+*/
 export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
     const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {}, state.plugin)
     const extension = !ext ? {} : { [ext.name]: ext.init(core as any) } as {}
