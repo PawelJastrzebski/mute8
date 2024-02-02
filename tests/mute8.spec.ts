@@ -1,4 +1,4 @@
-import { newStore } from "../packages/mute8/mute8"
+import { newStore, Plugin } from "../packages/mute8/mute8"
 import { wait } from "./utils"
 
 describe("Unit mute8", () => {
@@ -289,4 +289,31 @@ test('Async actions', async () => {
     expect(store.fetchCount).toEqual(5)
     await store.async.other()
     expect(store.fetchCount).toEqual(6)
+})
+
+describe("Plugin", () => {
+
+    test('Empty Plugin', async () => {
+        const empty: Plugin = {
+            BInit: function (initState: any) {
+                return initState
+            },
+            BUpdate: function (newState: any) {
+                return newState
+            },
+            AChange: function (oldState: Readonly<any>, newState: any): void { }
+        }
+
+        const store = newStore({
+            value: {
+                count: 1,
+            },
+            plugin: (core) => {
+                expect(core.snap().count).toEqual(1)
+                return empty;
+            }
+        })
+        expect(store.count).toEqual(1)
+    })
+
 })

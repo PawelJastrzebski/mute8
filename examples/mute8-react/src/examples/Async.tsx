@@ -1,4 +1,5 @@
 import { newStore } from 'mute8-react'
+import { CombinePlugins, LocalStoragePlugin, DevPlugin } from 'mute8-plugins'
 
 interface User {
   id: number,
@@ -28,7 +29,7 @@ const store = newStore({
   },
   async: {
     async fetchUsers() {
-      if(this.snap().state === 'pending') {
+      if (this.snap().state === 'pending') {
         return
       }
 
@@ -46,7 +47,8 @@ const store = newStore({
         this.actions.setFetchState("error")
       }
     }
-  }
+  },
+  plugin: CombinePlugins(LocalStoragePlugin.new("async-users"), DevPlugin.new("async-users"))
 })
 
 const stateInfo = (state: FetchState) => {
@@ -110,7 +112,7 @@ function Async() {
           <tfoot>
             <tr>
               <td colSpan={5}>
-                <h4 style={{ margin: "10px 0" }} >Test API <a href='https://reqres.in/'>https://reqres.in/</a></h4>
+                <h4 style={{ margin: "10px 0" }} >Test API <a href='https://reqres.in/'>https://reqres.in</a></h4>
               </td>
             </tr>
           </tfoot>

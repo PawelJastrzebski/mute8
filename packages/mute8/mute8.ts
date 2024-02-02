@@ -5,15 +5,20 @@ const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;
-const deepFreeze = <T extends Object>(object: T) => {
-    for (const name of O.keys(object)) {
-        const value = object[name];
-        if (!!value && typeof value === "object") {
-            deepFreeze(value);
-        }
-    }
-    return freeze(object) as Readonly<T>
+
+export interface Plugin<T extends Object = {}> {
+    /** BeforeInit() */
+    BInit(initState: T): T
+    /** BeforeUpdate() */
+    BUpdate(newState: T): T
+    /** AfterChange() */
+    AChange(oldState: Readonly<T>, newState: T): void
 }
+const defaultPlugin: () => Plugin = () => ({
+    BInit: (v) => v,
+    BUpdate: (v) => v,
+    AChange: (v1, v2) => { }
+})
 
 class StoreCore<T, A, AA> {
     private id: number = 0; // subscription id
@@ -25,13 +30,14 @@ class StoreCore<T, A, AA> {
     private aa: AA // async action
     private aap: any // async action proxy
     readonly bp: StoreProxy<T, A, AA>; // big proxy
+    private p: Plugin<T>
 
-    constructor(inner: T, actions: A, aactions: AA) {
-        this.i = deepFreeze(assign({}, inner))
+    constructor(inner: T, actions: A, aactions: AA, plugin?: (bp: StoreProxy<T, A, AA>) => Plugin<T>) {
+        this.i = freeze(assign({}, inner))
         this.a = freeze(actions);
-        this.ap = freeze(buildActionsProxy((n) => this.aFn(n)))
+        this.ap = freeze(buildActionsProxy(this.aFn.bind(this)))
         this.aa = freeze(aactions);
-        this.aap = freeze(buildActionsProxy((n) => this.aaFn(n)))
+        this.aap = freeze(buildActionsProxy(this.aaFn.bind(this)))
         // init big proxy
         const core = this;
         this.bp = {
@@ -43,7 +49,10 @@ class StoreCore<T, A, AA> {
             set mut(v: Partial<T>) { core.u(v) },
             /** @ts-ignore */
             get mut() { return core.mutFn.bind(core) }
-        } 
+        }
+        // init plugin
+        this.p = (plugin ?? defaultPlugin)(this.bp) as Plugin<T>
+        this.i = freeze(this.p.BInit(assign({}, inner)))
     }
 
     /** getAsyncActionFunction() */
@@ -70,11 +79,11 @@ class StoreCore<T, A, AA> {
 
     /** update() */
     u(newState: Partial<T>): void {
-        const newFinal = deepFreeze(assign(deepClone(this.i), newState));
-
+        const newFinal = this.p.BUpdate(assign(deepClone(this.i), newState))
         if (toJson(this.i) !== toJson(newFinal)) {
-            this.i = newFinal;
             clearTimeout(this.t);
+            this.p.AChange(this.i, newFinal)
+            this.i = freeze(newFinal)
             this.t = setTimeout(this.ns.bind(this), 0);
         }
     }
@@ -85,7 +94,7 @@ class StoreCore<T, A, AA> {
     }
 
     /** notifySubs() */
-    ns(): void {
+    private ns(): void {
         for (const id of O.keys(this.c)) {
             this.c[id](this.i)
         }
@@ -128,8 +137,11 @@ export interface ProxyExtension<T, A, AA> {
     init(core: StoreCore<T, A, AA>): object
 }
 
+/**  
+* Use Only for internal ProxyExtension
+*/
 export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
-    const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {})
+    const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {}, state.plugin)
     const extension = !ext ? {} : { [ext.name]: ext.init(core as any) } as {}
     const bigProxy = assign(extension, core.bp)
 
@@ -152,16 +164,18 @@ export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: P
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
+export type PluginBuilder<T, A, AA> = (proxy: StoreProxy<T, A, AA>) => Plugin
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export type Sub = { destroy(): void }
 
 export type VoidFn = ((...args: any) => undefined)
 export type AsyncFn = ((...args: any) => Promise<void>);
-export interface StoreDefiniton<T, A, AA> {
-    value: T & object & ExcludeKeys,
+export interface StoreDefiniton<T extends Object, A, AA> {
+    value: T & object & ExcludeKeys
     actions?: A & ThisType<T> & Record<string, VoidFn>
     async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
+    plugin?: PluginBuilder<T, A, AA>
 }
 export const newStore = <T, A, AA>(state: StoreDefiniton<T, A, AA>) => {
     return newStoreProxy(state) as Store<T, A, AA>
