@@ -48,7 +48,7 @@ const store = newStore({
       }
     }
   },
-  plugin: CombinePlugins(LocalStoragePlugin.new("async_users"), DevPlugin.new("cars"))
+  plugin: CombinePlugins(LocalStoragePlugin.new("async-users"), DevPlugin.new("async-users"))
 })
 
 const stateInfo = (state: FetchState) => {
