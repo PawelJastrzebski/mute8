@@ -1,6 +1,125 @@
-import { themes as prismThemes } from 'prism-react-renderer';
+import { themes as prismThemes, PrismTheme } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+
+const myCodeTheme: PrismTheme = {
+  plain: {
+    color: "#6699cc",
+    backgroundColor: "#161618",
+  },
+  styles: [
+    {
+      types: ["prolog"],
+      style: {
+        color: "rgb(0, 0, 128)",
+      },
+    },
+    {
+      types: ["comment"],
+      style: {
+        color: "rgb(120, 120, 120)",
+      },
+    },
+    {
+      types: ["builtin", "changed", "interpolation-punctuation"],
+      style: {
+        color: "rgb(86, 156, 214)",
+      },
+    },
+    {
+      types: ["keyword"],
+      style: {
+        color: "rgb(210, 0, 56)",
+      },
+    },
+    {
+      types: ["number", "inserted"],
+      style: {
+        color: "rgb(157, 205, 124)",
+      },
+    },
+    {
+      types: ["constant"],
+      style: {
+        color: "rgb(100, 102, 149)",
+      },
+    },
+    {
+      types: ["attr-name", "variable"],
+      style: {
+        color: "rgb(156, 220, 254)",
+      },
+    },
+    {
+      types: ["deleted", "string", "attr-value", "template-punctuation"],
+      style: {
+        color: "rgb(206, 145, 120)",
+      },
+    },  
+     {
+      types: ["string"],
+      style: {
+        color: "rgb(157, 205, 124)",
+      },
+    },
+    {
+      types: ["selector"],
+      style: {
+        color: "rgb(215, 186, 125)",
+      },
+    },
+    {
+      // Fix tag color
+      types: ["tag"],
+      style: {
+        color: "rgb(78, 201, 176)",
+      },
+    },
+    {
+      // Fix tag color for HTML
+      types: ["tag"],
+      languages: ["markup"],
+      style: {
+        color: "rgb(86, 156, 214)",
+      },
+    },
+    {
+      types: ["punctuation", "operator"],
+      style: {
+        color: "rgb(212, 212, 212)",
+      },
+    },
+    {
+      // Fix punctuation color for HTML
+      types: ["punctuation"],
+      languages: ["markup"],
+      style: {
+        color: "#808080",
+      },
+    },
+    {
+      types: ["function"],
+      style: {
+        color: "rgb(220, 220, 170)",
+      },
+    },
+    {
+      types: ["class-name"],
+      style: {
+        color: "rgb(78, 201, 176)",
+      },
+    },
+    {
+      types: ["char"],
+      style: {
+        color: "rgb(209, 105, 105)",
+      },
+    },
+  ],
+}
+
+const myCodeThemeLight = JSON.parse(JSON.stringify(myCodeTheme))
+myCodeThemeLight.plain.background = "#333333"
 
 const repoUrl = "https://github.com/PawelJastrzebski/mute8"
 
@@ -69,13 +188,13 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'home',
           position: 'left',
-          label: 'Documentation',
+          label: 'Project',
         },
         {
           type: 'dropdown',
-          label: ' ',
+          label: 'Packages',
           position: 'left',
-          className: "short-dropdown",
+          // className: "short-dropdown",
           items: [
             {
               type: 'doc',
@@ -168,13 +287,17 @@ const config: Config = {
       //     ],
       //   },
       // ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+      copyright: `© ${new Date().getFullYear()} Mute8. Built with Docusaurus.`,
     },
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: myCodeThemeLight,
+      darkTheme: myCodeTheme,
+      // darkTheme: prismThemes.vsDark,
     },
   } satisfies Preset.ThemeConfig,
 };
+
+
+// console.log(JSON.stringify(prismThemes.vsDark))
 
 export default config;

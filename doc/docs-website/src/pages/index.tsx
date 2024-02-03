@@ -5,7 +5,7 @@ import Layout from '@theme/Layout';
 import { useLocation } from '@docusaurus/router';
 
 function Logo() {
-  const logo = <div></div>
+  const logo = <div><div className="img"></div></div>
   return (
     <div className="my-card">
       <div id='logo'>{logo}</div>
@@ -26,7 +26,7 @@ function HeroSection() {
           <p>
             When it comes to coding, remember that "less is more." Build applications swiftly with a streamlined state flow, avoiding unnecessary boilerplate code.
           </p>
-          <Link to={"/mute8/docs/intro"}>
+          <Link to={"/mute8/docs/introduction/getting-started"}>
             <button className='my-button'>Read More</button>
           </Link>
         </div>
@@ -41,7 +41,7 @@ export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      noFooter={true}
+      noFooter={false}
       title={`Hello from ${siteConfig.title}`}
       description="Description will go into a meta tag in <head />">
       <Logo />
