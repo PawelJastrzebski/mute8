@@ -2,31 +2,7 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Heading from '@theme/Heading';
-
-import styles from './index.module.css';
-
-function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
-  return (
-    <header className={clsx('hero hero--primary', styles.heroBanner)}>
-      <div className="container">
-        <Heading as="h1" className="hero__title">
-          {siteConfig.title}
-        </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
-        <div className={styles.buttons}>
-          <Link
-            className="button button--secondary button--lg"
-            to="/docs/intro">
-            Docusaurus Tutorial - 5min ⏱️
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
+import { useLocation } from '@docusaurus/router';
 
 function Logo() {
   const logo = <div></div>
@@ -37,6 +13,30 @@ function Logo() {
   )
 }
 
+function HeroSection() {
+  const location = useLocation();
+  return (
+    <div id='hero-section'>
+      <div className="logo-section">
+        <div className="logo"></div>
+      </div>
+      <div className="text-section">
+        <div className="text">
+          <h2>Simple yet Powerful</h2>
+          <p>
+            When it comes to coding, remember that "less is more." Build applications swiftly with a streamlined state flow, avoiding unnecessary boilerplate code.
+          </p>
+          <Link to={"/mute8/docs/intro"}>
+            <button className='my-button'>Read More</button>
+          </Link>
+        </div>
+      </div>
+
+    </div>
+  )
+
+}
+
 export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   return (
@@ -45,6 +45,7 @@ export default function Home(): JSX.Element {
       title={`Hello from ${siteConfig.title}`}
       description="Description will go into a meta tag in <head />">
       <Logo />
+      <HeroSection />
       <main>
         {/* <HomepageFeatures /> */}
       </main>
