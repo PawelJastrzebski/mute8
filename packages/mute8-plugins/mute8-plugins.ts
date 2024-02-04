@@ -63,33 +63,36 @@ export type RegistryOptions = {
     deepFreaze: boolean
 }
 
-const fetchDevToolsClient = async () => {
+const fetchDevToolsClient = async (scriptUrl: string) => {
     return new Promise((resolve, _) => {
         if (!document || !window) return;
         var script = document.createElement("script");
         script.onload = () => {
-            const loaded = window["f72f1acd8"]
-            delete window["f72f1acd8"]
+            const loaded = window["mut8-DevTools"]
+            delete window["mut8-DevTools"]
             resolve(loaded)
         }
         script.type = "module"
-        script.src = "http://localhost:4040/devtools-client.mjs";
+        script.src = scriptUrl;
         document.head.appendChild(script)
     })
 }
 
 export interface DevToolsInterface {
+    readonly fullClientUrl: string,
     readonly loaded: boolean
     enable: () => Promise<void>
     register: <T, A, AA>(label: string, options?: RegistryOptions) => PluginBuilder<T, A, AA>
 }
 
+// thin client
 export let DevTools: DevToolsInterface = {
+    fullClientUrl: "http://localhost:4040/devtools-v1.mjs",
     loaded: false,
     register() {
         return defaultPlugin
     },
     async enable() {
-        DevTools = await fetchDevToolsClient() as any;
+        DevTools = await fetchDevToolsClient(DevTools.fullClientUrl) as any;
     }
 }

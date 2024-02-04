@@ -24,6 +24,7 @@ interface Registry<T extends Object = any> {
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
+    readonly fullClientUrl = ""
     readonly loaded = true;
     async enable() { }
     readonly Mute8DevToolsUIUrl: string = "http://localhost:4030"; // TODO set to prod
@@ -96,7 +97,7 @@ class DevTools implements DevToolsInterface {
         const settings = `toolbar=0, scrollbars=1, resizable=1, width=${w}, height=${h}, top=${top}, left=${left}`;
         this.devtoolsWindow = window.open(this.Mute8DevToolsUIUrl, "_blank", settings)
         this.initDevToolsWindowHandlers()
-        
+
     }
     initDevToolsWindowHandlers() {
         const tools = this;
@@ -107,6 +108,6 @@ class DevTools implements DevToolsInterface {
 
 // Dom Inject (required by mute8 DevTools plugin)
 const inject = () => {
-    window["f72f1acd8"] = new DevTools()
+    window["mut8-DevTools"] = new DevTools()
 }
 inject();
