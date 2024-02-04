@@ -14,7 +14,7 @@ export interface Plugin<T extends Object = {}> {
     /** AfterChange() */
     AChange(oldState: Readonly<T>, newState: T): void
 }
-const defaultPlugin: () => Plugin = () => ({
+export const defaultPlugin: () => Plugin = () => ({
     BInit: (v) => v,
     BUpdate: (v) => v,
     AChange: (v1, v2) => { }

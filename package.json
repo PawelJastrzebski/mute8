@@ -16,7 +16,8 @@
     "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react && npm publish ./packages/mute8-plugins",
-    "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run && npm publish ./packages/mute8-plugins --dry-run"
+    "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run && npm publish ./packages/mute8-plugins --dry-run",
+    "devtools": "cd devtools-client && concurrently \"npx tsup ./devtools-client.ts --watch --treeshake --format esm\" \"npx serve dist --cors -p 4040\" "
   },
   "engines": {
     "node": ">=21.0.0"
@@ -41,6 +42,7 @@
     "concurrently": "^8.2.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "serve": "^14.2.1",
     "ts-node": "^9.1.1",
     "tsup": "^8.0.1",
     "typescript": "^5.3.3"

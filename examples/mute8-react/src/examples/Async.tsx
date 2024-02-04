@@ -1,5 +1,7 @@
 import { newStore } from 'mute8-react'
-import { CombinePlugins, LocalStoragePlugin, DevPlugin } from 'mute8-plugins'
+import { CombinePlugins, LocalStoragePlugin, DevTools } from 'mute8-plugins'
+await DevTools.enable()
+console.log(DevTools)
 
 interface User {
   id: number,
@@ -48,7 +50,10 @@ const store = newStore({
       }
     }
   },
-  plugin: CombinePlugins(LocalStoragePlugin.new("async-users"), DevPlugin.new("async-users"))
+  plugin: CombinePlugins(
+    LocalStoragePlugin.new("async-users"),
+    DevTools.register("async-users")
+  )
 })
 
 const stateInfo = (state: FetchState) => {

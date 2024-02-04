@@ -1,4 +1,4 @@
-import { Plugin, PluginBuilder, StoreProxy } from "../mute8/mute8"
+import { Plugin, PluginBuilder, StoreProxy, defaultPlugin } from "../mute8/mute8"
 
 // CombinePlugins Util
 export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilder<T, A, AA>[]) => {
@@ -26,7 +26,6 @@ export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilde
                 }
             }
         }
-
     }
 }
 
@@ -55,59 +54,42 @@ export const LocalStoragePlugin = {
     }
 }
 
-// DevPlugin
-const deepFreeze = <T extends Object>(object: T) => {
-    for (const name of Object.keys(object)) {
-        const value = object[name];
-        if (!!value && typeof value === "object") {
-            deepFreeze(value);
-        }
-    }
-    return Object.freeze(object) as Readonly<T>
-}
-
-export type DevPluginOptions = {
+// DevTool
+export type RegistryOptions = {
     logger: {
         logInit: boolean,
         logChange: boolean,
     },
     deepFreaze: boolean
 }
-const DevPluginOptionsDefault: DevPluginOptions = {
-    logger: { logChange: true, logInit: true },
-    deepFreaze: true
-}
-export const DevPlugin = {
-    new(label: string, options: DevPluginOptions = DevPluginOptionsDefault) {
-        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
-            return {
-                BInit: (initState) => {
-                    if (options.logger.logInit) {
-                        console.table({
-                            [`${label}-init`]: initState,
-                        })
-                    }
 
-                    if (options.deepFreaze) {
-                        return deepFreeze(initState)
-                    }
-                    return initState
-                },
-                BUpdate: (newState) => {
-                    if (options.deepFreaze) {
-                        return deepFreeze(newState)
-                    }
-                    return newState
-                },
-                AChange: (oldState, newState) => {
-                    if (options.logger.logChange) {
-                        console.table({
-                            [`${label}-old`]: oldState,
-                            [`${label}-new`]: newState
-                        })
-                    }
-                }
-            }
+const fetchDevToolsClient = async () => {
+    return new Promise((resolve, _) => {
+        if (!document || !window) return;
+        var script = document.createElement("script");
+        script.onload = () => {
+            const loaded = window["f72f1acd8"]
+            delete window["f72f1acd8"]
+            resolve(loaded)
         }
+        script.type = "module"
+        script.src = "http://localhost:4040/devtools-client.mjs";
+        document.head.appendChild(script)
+    })
+}
+
+export interface DevToolsInterface {
+    readonly loaded: boolean
+    enable: () => Promise<void>
+    register: <T, A, AA>(label: string, options?: RegistryOptions) => PluginBuilder<T, A, AA>
+}
+
+export let DevTools: DevToolsInterface = {
+    loaded: false,
+    register() {
+        return defaultPlugin
+    },
+    async enable() {
+        DevTools = await fetchDevToolsClient() as any;
     }
 }

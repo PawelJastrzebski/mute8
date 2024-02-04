@@ -42,9 +42,7 @@ const router = newStore({
 function Logo() {
   const logo = <div></div>
   return (
-    <a target='_blank' href='https://github.com/PawelJastrzebski/mute8'>
-      <div id='logo'>{logo}</div>
-    </a>
+    <div id='logo'>{logo}</div>
   )
 }
 
