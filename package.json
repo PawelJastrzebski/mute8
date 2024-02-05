@@ -12,7 +12,8 @@
     "build": "concurrently -n mute8,mute8-react,mute8-plugins \"npm run build:mute8\" \"npm run build:mute8-react\" \"npm run build:mute8-plugins\" ",
     "build:mute8": "cd ./packages/mute8 && npx tsup ./mute8.ts --format cjs,esm --dts --minify",
     "build:mute8-react": "cd ./packages/mute8-react && npx tsup ./mute8-react.ts --format cjs,esm --dts --minify --external react",
-    "build:mute8-plugins": "cd ./packages/mute8-plugins && npx tsup ./mute8-plugins.ts --format cjs,esm --dts --minify --external react",
+    "build:mute8-plugins": "cd ./packages/mute8-plugins && npx tsup ./mute8-plugins.ts --format cjs,esm --dts --minify",
+    "build:mute8-solid": "cd ./packages/mute8-solid && npx tsup ./mute8-solid.ts --format cjs,esm --dts --minify --external solid-js",
     "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react && npm publish ./packages/mute8-plugins",
@@ -26,7 +27,8 @@
   "license": "MIT",
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "solid-js": "^1.8.12"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

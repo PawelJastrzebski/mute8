@@ -1,0 +1,28 @@
+{
+    "name": "mute8-solid",
+    "description": "Solid State Container",
+    "version": "0.0.0-alpha.0",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "private": true,
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8-solid.cjs",
+    "module": "dist/mute8-solid.js",
+    "types": "dist/mute8-solid.d.ts",
+    "scripts": {},
+    "keywords": [
+        "Solid",
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable"
+    ],
+    "peerDependencies": {
+        "solid-js": "^1.8.12"
+    }
+}
