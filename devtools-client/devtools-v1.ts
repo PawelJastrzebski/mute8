@@ -1,5 +1,6 @@
 import { RegistryOptions, DevToolsInterface } from "../packages/mute8-plugins/mute8-plugins";
 import { StoreProxy, Plugin, PluginBuilder } from "../packages/mute8/mute8";
+import { WindowHost } from "../node_modules/cors-window"
 
 const deepFreeze = <T extends Object>(object: T) => {
     for (const name of Object.keys(object)) {
@@ -29,7 +30,7 @@ class DevTools implements DevToolsInterface {
     async enable() { }
     readonly Mute8DevToolsUIUrl: string = "http://localhost:4030"; // TODO set to prod
     private sotrageRegistry: Map<string, Registry> = new Map();
-    private devtoolsWindow: WindowProxy | null
+    private dialogHost: WindowHost | null
 
     constructor() {
         const tool = this;
@@ -84,25 +85,24 @@ class DevTools implements DevToolsInterface {
         }
     }
     openDevTools() {
-        if (this.devtoolsWindow && this.devtoolsWindow.closed == false) {
-            this.devtoolsWindow.focus()
+        if (this.dialogHost && this.dialogHost.isOpen()) {
+            this.dialogHost.child?.focus()
             return;
         }
 
-        // todo openWindow function with better position support
-        const w = 800;
-        const h = 500;
-        const left = ((window?.innerWidth ?? 600) / 2) + (window?.screenLeft ?? 0) - (w / 2)
-        const top = (window?.innerHeight ?? 500) / 2
-        const settings = `toolbar=0, scrollbars=1, resizable=1, width=${w}, height=${h}, top=${top}, left=${left}`;
-        this.devtoolsWindow = window.open(this.Mute8DevToolsUIUrl, "_blank", settings)
-        this.initDevToolsWindowHandlers()
+        console.log("opening")
 
-    }
-    initDevToolsWindowHandlers() {
-        const tools = this;
-        if (!tools.devtoolsWindow) return
-        // todo
+        this.dialogHost = new WindowHost(this.Mute8DevToolsUIUrl, "devtools", {
+            height: 400,
+            width: 600,
+        })
+
+        this.dialogHost.onMessage = (msg) => {
+            console.log(msg)
+        }
+        setInterval(() => {
+            this.dialogHost?.post({test: "OK"})
+        }, 1500)
     }
 }
 

@@ -82,6 +82,7 @@ export interface DevToolsInterface {
     readonly fullClientUrl: string,
     readonly loaded: boolean
     enable: () => Promise<void>
+    openDevTools: () => void;
     register: <T, A, AA>(label: string, options?: RegistryOptions) => PluginBuilder<T, A, AA>
 }
 
@@ -89,6 +90,7 @@ export interface DevToolsInterface {
 export let DevTools: DevToolsInterface = {
     fullClientUrl: "http://localhost:4040/devtools-v1.mjs",
     loaded: false,
+    openDevTools() { },
     register() {
         return defaultPlugin
     },
