@@ -55,7 +55,7 @@ export const LocalStoragePlugin = {
 }
 
 // DevTool
-export type RegistryOptions = {
+export type DevToolsOptions = {
     logger: {
         logInit: boolean,
         logChange: boolean,
@@ -63,38 +63,83 @@ export type RegistryOptions = {
     deepFreaze: boolean
 }
 
-const fetchDevToolsClient = async (scriptUrl: string) => {
+export const _WINDOW_KEY = "MUTE-8-DEVTOOLS"
+const getCacheJs = () => localStorage.getItem(_WINDOW_KEY)
+const setCacheJs = (code: string) => localStorage.setItem(_WINDOW_KEY, code)
+export const removeCacheJs = () => localStorage.removeItem(_WINDOW_KEY)
+const fetchJs = async (): Promise<void> => {
+    const res = await fetch("http://localhost:4040/devtools-v1.mjs")
+    const js = await res.text()
+    setCacheJs(js)
+}
+const injectJs = async (jsCode: string): Promise<void> => {
+    if (!!document.getElementById(_WINDOW_KEY)) {
+        return
+    }
     return new Promise((resolve, _) => {
         if (!document || !window) return;
         var script = document.createElement("script");
-        script.onload = () => {
-            const loaded = window["mut8-DevTools"]
-            delete window["mut8-DevTools"]
-            resolve(loaded)
-        }
+        script.id = _WINDOW_KEY
         script.type = "module"
-        script.src = scriptUrl;
+        script.innerText = jsCode
         document.head.appendChild(script)
+        setTimeout(resolve, 10)
     })
 }
 
-export interface DevToolsInterface {
-    readonly fullClientUrl: string,
-    readonly loaded: boolean
-    enable: () => Promise<void>
-    openDevTools: () => void;
-    register: <T, A, AA>(label: string, options?: RegistryOptions) => PluginBuilder<T, A, AA>
+const js = getCacheJs();
+if (js) {
+    await injectJs(js)
+    fetchJs()
 }
 
-// thin client
-export let DevTools: DevToolsInterface = {
-    fullClientUrl: "http://localhost:4040/devtools-v1.mjs",
-    loaded: false,
-    openDevTools() { },
-    register() {
-        return defaultPlugin
+/** ThinClient - call enable() to initialize */
+export interface DevToolsInterface {
+    enable: () => void
+    disable: () => void
+    openDevTools: (globalOptions?: DevToolsOptions) => void;
+    register: <T, A, AA>(label: string, options?: DevToolsOptions) => PluginBuilder<T, A, AA>
+}
+
+export const DevTools: DevToolsInterface = window[_WINDOW_KEY] ?? {
+    disable() {
+        removeCacheJs()
     },
-    async enable() {
-        DevTools = await fetchDevToolsClient(DevTools.fullClientUrl) as any;
+    enable() {
+        const devtoolsJs = getCacheJs();
+        if (!devtoolsJs) {
+            fetchJs().then(() => window.location.reload())
+        }
+    },
+    register() { return defaultPlugin },
+    openDevTools() { },
+} as DevToolsInterface;
+
+export namespace DevToolsPrivateTypes {
+
+    export interface StorageDefintion {
+        label: string
     }
+
+    export interface InitState {
+        storageLabel: string,
+        state: object
+    }
+
+    export interface ChangeState {
+        storageLabel: string,
+        oldState: object,
+        newState: object,
+    }
+
+    export interface Payload {
+        // Host to Dialog
+        "storage-definitions"?: Array<StorageDefintion>
+        "storage-state-init"?: InitState
+        "storage-state-changed"?: ChangeState
+        "devtools-options"?: DevToolsOptions
+        // Dialog to Host
+        "host-command"? : "refresh-host"
+    }
+
 }
