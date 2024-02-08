@@ -33,7 +33,7 @@ class DevTools implements DevToolsInterface {
     readonly Mute8DevToolsUIUrl: string = "http://localhost:4030"; // TODO set to prod
     private sotrageRegistry: Map<string, Registry> = new Map();
     private dialogHost: WindowHost | null
-
+    private payloadBuffer: DevTypes.Payload[] = []
     constructor() {
         const tool = this;
         document.addEventListener('keydown', function (event) {
@@ -101,43 +101,40 @@ class DevTools implements DevToolsInterface {
         this.dialogHost.onChildAttach = this.sentInitData.bind(this)
         this.dialogHost.onChildClose = () => setDevToolsStatus("closed")
     }
+    private postPayload(payload: DevTypes.Payload[]) {
+        this.dialogHost?.post(payload)
+        this.payloadBuffer = this.payloadBuffer.concat(...payload)
+    }
     private setStateInit(label: string, state: object) {
-        const payload: DevTypes.Payload = {
+        this.postPayload([{
             "storage-state-init": {
                 storageLabel: label,
                 state: state
             }
-        }
-        this.dialogHost?.post(payload)
-
+        }])
     }
     private setStateChanged(label: string, oldState: object, newState: object) {
-        const payload: DevTypes.Payload = {
+        this.postPayload([{
             "storage-state-changed": {
                 storageLabel: label,
                 oldState: oldState,
                 newState: newState
             }
-        }
-        this.dialogHost?.post(payload)
+        }])
     }
     private sentInitData() {
         setDevToolsStatus("open")
-        const all = Array.from(this.sotrageRegistry.entries()).map(([name, registry]) => {
-            return {
-                label: name
-            }
-        })
-        const payload: DevTypes.Payload = {
-            "storage-definitions": all
-        }
-        this.dialogHost?.post(payload)
+        const list = Array.from(this.sotrageRegistry.entries());
+        const all = list.map(([name, registry]) =>  ({label: name }))
+        this.dialogHost!.post([{ "init": {} }, { "storage-definitions": all }, ...this.payloadBuffer])
     }
-    private handleMessage(payload: DevTypes.Payload) {
-        if(payload["host-command"]) {
-            const command = payload["host-command"];
-            if( command === 'refresh-host') {
-                window.location.reload()
+    private handleMessage(list: DevTypes.Payload[]) {
+        for (const p of list) {
+            if (p["host-command"]) {
+                const command = p["host-command"];
+                if (command === 'refresh-host') {
+                    window.location.reload()
+                }
             }
         }
     }

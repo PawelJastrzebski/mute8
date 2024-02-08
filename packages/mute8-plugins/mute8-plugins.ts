@@ -134,6 +134,7 @@ export namespace DevToolsPrivateTypes {
 
     export interface Payload {
         // Host to Dialog
+        "init"?: {}
         "storage-definitions"?: Array<StorageDefintion>
         "storage-state-init"?: InitState
         "storage-state-changed"?: ChangeState
