@@ -23,8 +23,9 @@ interface Registry<T extends Object = any> {
     onChange: (oldState: T, newState: T) => void
 }
 
-const setDevToolsStatus = (status: "open" | "closed") => localStorage.setItem("dev-tools-opne", status);
-const getDevToolsStatus = () => localStorage.getItem("dev-tools-opne");
+const now = () => new Date().getTime()
+const setDevToolsStatus = (status: "open" | "closed") => localStorage.setItem("dev-tools-opne", status)
+const getDevToolsStatus = () => localStorage.getItem("dev-tools-opne")
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
@@ -109,7 +110,8 @@ class DevTools implements DevToolsInterface {
         this.postPayload([{
             "storage-state-init": {
                 storageLabel: label,
-                state: state
+                state: state,
+                time: now()
             }
         }])
     }
@@ -118,7 +120,8 @@ class DevTools implements DevToolsInterface {
             "storage-state-changed": {
                 storageLabel: label,
                 oldState: oldState,
-                newState: newState
+                newState: newState,
+                time: now()
             }
         }])
     }

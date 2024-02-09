@@ -124,12 +124,14 @@ export namespace DevToolsPrivateTypes {
     export interface InitState {
         storageLabel: string,
         state: object
+        time: number
     }
 
     export interface ChangeState {
         storageLabel: string,
         oldState: object,
         newState: object,
+        time: number
     }
 
     export interface Payload {
