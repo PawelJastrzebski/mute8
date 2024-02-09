@@ -93,8 +93,8 @@ class DevTools implements DevToolsInterface {
             return;
         }
         this.dialogHost = new WindowHost(this.Mute8DevToolsUIUrl, "devtools", {
-            height: 500,
-            width: 700,
+            height: 550,
+            width: 800,
         })
         this.dialogHost.onMessage = this.handleMessage.bind(this)
         this.dialogHost.onChildOpen = this.sentInitData.bind(this)

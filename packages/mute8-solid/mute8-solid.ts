@@ -3,7 +3,7 @@ import { Store as StoreMute8, StoreDefiniton, ProxyExtension, Plugin } from "../
 import { createSignal, createEffect } from 'solid-js';
 
 interface SolidExtension<T> {
-    use(): [T, (newValeu: Partial<T>) => void]
+    use(): [() => T, (newValeu: Partial<T>) => void]
     useOne<K extends keyof T>(property: K): [() => T[K], (newValue: T[K]) => void]
 }
 
@@ -19,7 +19,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                 use() {
                     const [value, setValue] = createSignal(core.s());
                     createEffect(() => {
-                        const sub = core.sub((s) => setValue(s as any))
+                        const sub = core.sub(s => setValue(s as any))
                         return () => sub.destroy()
                     }, [value])
                     return [value, (v: any) => core.u(v)]
