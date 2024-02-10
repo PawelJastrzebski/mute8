@@ -4,7 +4,6 @@
     "version": "0.0.0-alpha.0",
     "type": "module",
     "author": "Paweł Jastrzębski",
-    "private": true,
     "license": "MIT",
     "repository": {
         "type": "git",

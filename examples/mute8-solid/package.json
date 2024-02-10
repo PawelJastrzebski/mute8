@@ -12,7 +12,7 @@
     "node": ">=21.0.0"
   },
   "dependencies": {
-    "mute8-solid": "file:src/mute8-solid",
+    "mute8-solid": "^0.0.0-alpha.0",
     "solid-js": "^1.8.7"
   },
   "devDependencies": {
