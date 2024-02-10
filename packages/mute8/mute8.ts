@@ -164,7 +164,7 @@ export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: P
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
-export type PluginBuilder<T, A, AA> = (proxy: StoreProxy<T, A, AA>) => Plugin
+export type PluginBuilder<T = object> = (proxy: StoreProxy<T, any, any>) => Plugin
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export type Sub = { destroy(): void }
@@ -175,7 +175,7 @@ export interface StoreDefiniton<T extends Object, A, AA> {
     value: T & object & ExcludeKeys
     actions?: A & ThisType<T> & Record<string, VoidFn>
     async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
-    plugin?: PluginBuilder<T, A, AA>
+    plugin?: PluginBuilder
 }
 export const newStore = <T, A, AA>(state: StoreDefiniton<T, A, AA>) => {
     return newStoreProxy(state) as Store<T, A, AA>

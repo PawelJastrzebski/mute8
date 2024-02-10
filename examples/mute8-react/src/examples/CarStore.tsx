@@ -1,3 +1,4 @@
+import { DevTools } from 'mute8-plugins';
 import { newStore } from 'mute8-react'
 
 function randomNumber(min: number, max: number) {
@@ -22,7 +23,8 @@ const store = newStore({
     removeCar(id: number) {
       this.cars = this.cars.filter(c => c.id != id)
     },
-  }
+  },
+  plugin: DevTools.register("car-store")
 })
 
 store.actions.addCar({

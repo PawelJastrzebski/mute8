@@ -5,6 +5,7 @@ import { newStore } from 'mute8-react'
 import Couter from './examples/Counter.tsx'
 import CarStore from './examples/CarStore.tsx'
 import Async from './examples/Async.tsx'
+import { DevTools } from 'mute8-plugins'
 
 type Example = {
   name: string,
@@ -35,7 +36,8 @@ const router = newStore({
     openExample(example: ExampleId) {
       this.currentExample = example
     }
-  }
+  },
+  plugin: DevTools.register("router")
 })
 
 function Logo() {

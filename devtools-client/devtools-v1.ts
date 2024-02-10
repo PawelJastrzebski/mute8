@@ -33,7 +33,7 @@ class DevTools implements DevToolsInterface {
     disable = () => removeCacheJs();
     readonly Mute8DevToolsUIUrl: string = "http://localhost:4030"; // TODO set to prod
     private sotrageRegistry: Map<string, Registry> = new Map();
-    private dialogHost: WindowHost | null
+    private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []
     constructor() {
         const tool = this;
@@ -44,8 +44,8 @@ class DevTools implements DevToolsInterface {
             }
         });
     }
-    register(label: string, options: DevToolsOptions = registryOptionsDefault): PluginBuilder<any, any, any> {
-        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
+    register(label: string, options: DevToolsOptions = registryOptionsDefault): PluginBuilder {
+        return <T extends object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
             const onInit = (v: T) => this.setStateInit(label, v)
             const onChange = (v1: T, v2: T) => { this.setStateChanged(label, v1, v2) }
             this.sotrageRegistry.set(label, {
@@ -108,7 +108,7 @@ class DevTools implements DevToolsInterface {
     }
     private setStateInit(label: string, state: object) {
         this.postPayload([{
-            "storage-state-init": {
+            stateInit: {
                 storageLabel: label,
                 state: state,
                 time: now()
@@ -117,7 +117,7 @@ class DevTools implements DevToolsInterface {
     }
     private setStateChanged(label: string, oldState: object, newState: object) {
         this.postPayload([{
-            "storage-state-changed": {
+            stateChanged: {
                 storageLabel: label,
                 oldState: oldState,
                 newState: newState,
@@ -128,8 +128,8 @@ class DevTools implements DevToolsInterface {
     private sentInitData() {
         setDevToolsStatus("open")
         const list = Array.from(this.sotrageRegistry.entries());
-        const all = list.map(([name, registry]) =>  ({label: name }))
-        this.dialogHost!.post([{ "init": {} }, { "storage-definitions": all }, ...this.payloadBuffer])
+        const all = list.map(([name, _]) => ({ label: name }))
+        this.dialogHost!.post([{ init: {} }, { storageDefinitions: all }, ...this.payloadBuffer])
     }
     private handleMessage(list: DevTypes.Payload[]) {
         for (const p of list) {

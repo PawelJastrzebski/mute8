@@ -1,7 +1,7 @@
 import { Plugin, PluginBuilder, StoreProxy, defaultPlugin } from "../mute8/mute8"
 
 // CombinePlugins Util
-export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilder<T, A, AA>[]) => {
+export const CombinePlugins = (...plugins: PluginBuilder[]) => {
     return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
         const initializedPlugins = plugins.map(p => p(proxy as any)) as Plugin<T>[]
 
@@ -31,12 +31,12 @@ export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilde
 
 // Local Storeage
 export const LocalStoragePlugin = {
-    new(storageKey: string) {
+    new(storageKey: string): PluginBuilder {
         const setItem = async (value: any) => {
             localStorage.setItem(storageKey, JSON.stringify(value))
         }
 
-        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
+        return <T = object>(proxy: StoreProxy<T, any, any>): Plugin => {
             return {
                 BInit: (initState) => {
                     try {
@@ -98,7 +98,7 @@ export interface DevToolsInterface {
     enable: () => void
     disable: () => void
     openDevTools: (globalOptions?: DevToolsOptions) => void;
-    register: <T, A, AA>(label: string, options?: DevToolsOptions) => PluginBuilder<T, A, AA>
+    register: (label: string, options?: DevToolsOptions) => PluginBuilder
 }
 
 export const DevTools: DevToolsInterface = window[_WINDOW_KEY] ?? {
@@ -136,13 +136,13 @@ export namespace DevToolsPrivateTypes {
 
     export interface Payload {
         // Host to Dialog
-        "init"?: {}
-        "storage-definitions"?: Array<StorageDefintion>
-        "storage-state-init"?: InitState
-        "storage-state-changed"?: ChangeState
-        "devtools-options"?: DevToolsOptions
+        init?: {}
+        storageDefinitions?: Array<StorageDefintion>
+        stateInit?: InitState
+        stateChanged?: ChangeState
+        devtoolsOptions?: DevToolsOptions
         // Dialog to Host
-        "host-command"? : "refresh-host"
+        hostCommand?: "refresh-host"
     }
 
 }
