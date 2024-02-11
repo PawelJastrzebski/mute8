@@ -83,7 +83,7 @@ const injectJs = async (jsCode: string): Promise<void> => {
         script.type = "module"
         script.innerText = jsCode
         document.head.appendChild(script)
-        setTimeout(resolve, 10)
+        setTimeout(resolve, 30)
     })
 }
 
@@ -134,6 +134,10 @@ export namespace DevToolsPrivateTypes {
         time: number
     }
 
+    export interface OverrideState {
+        state: object
+    }
+
     export interface Payload {
         // Host to Dialog
         init?: {}
@@ -143,6 +147,8 @@ export namespace DevToolsPrivateTypes {
         devtoolsOptions?: DevToolsOptions
         // Dialog to Host
         hostCommand?: "refresh-host"
+        // Both
+        stateOverrides?: Record<string, OverrideState>
     }
 
 }

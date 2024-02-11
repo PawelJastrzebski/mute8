@@ -35,6 +35,7 @@ class DevTools implements DevToolsInterface {
     private sotrageRegistry: Map<string, Registry> = new Map();
     private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []
+    private stateOverrides: Record<string, DevTypes.OverrideState> = {}
     constructor() {
         const tool = this;
         document.addEventListener('keydown', function (event) {
@@ -45,9 +46,10 @@ class DevTools implements DevToolsInterface {
         });
     }
     register(label: string, options: DevToolsOptions = registryOptionsDefault): PluginBuilder {
+        const devtools = this;
         return <T extends object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
-            const onInit = (v: T) => this.setStateInit(label, v)
-            const onChange = (v1: T, v2: T) => { this.setStateChanged(label, v1, v2) }
+            const onInit = (v: T) => devtools.setStateInit(label, v)
+            const onChange = (v1: T, v2: T) => { devtools.setStateChanged(label, v1, v2) }
             this.sotrageRegistry.set(label, {
                 label: label,
                 proxy: proxy,
@@ -70,8 +72,13 @@ class DevTools implements DevToolsInterface {
                     return initState
                 },
                 BUpdate: (newState) => {
+                    const ovverride = devtools.stateOverrides[label];
+                    if (ovverride) {
+                        newState = ovverride.state as T
+                    }
+
                     if (options.deepFreaze) {
-                        return deepFreeze(newState)
+                        newState = deepFreeze(newState)
                     }
                     return newState
                 },
@@ -107,6 +114,7 @@ class DevTools implements DevToolsInterface {
         this.payloadBuffer = this.payloadBuffer.concat(...payload)
     }
     private setStateInit(label: string, state: object) {
+        if (this.stateOverrides[label]) return
         this.postPayload([{
             stateInit: {
                 storageLabel: label,
@@ -116,6 +124,7 @@ class DevTools implements DevToolsInterface {
         }])
     }
     private setStateChanged(label: string, oldState: object, newState: object) {
+        if (this.stateOverrides[label]) return
         this.postPayload([{
             stateChanged: {
                 storageLabel: label,
@@ -129,12 +138,26 @@ class DevTools implements DevToolsInterface {
         setDevToolsStatus("open")
         const list = Array.from(this.sotrageRegistry.entries());
         const all = list.map(([name, _]) => ({ label: name }))
-        this.dialogHost!.post([{ init: {} }, { storageDefinitions: all }, ...this.payloadBuffer])
+        this.dialogHost!.post([
+            { init: {} },
+            { storageDefinitions: all },
+            { stateOverrides: this.stateOverrides }
+            , ...this.payloadBuffer
+        ])
     }
     private handleMessage(list: DevTypes.Payload[]) {
         for (const p of list) {
             if (p.hostCommand === 'refresh-host') {
                 window.location.reload()
+            }
+            if (p.stateOverrides) {
+                this.stateOverrides = p.stateOverrides ?? {}
+                for (const [label, registry] of this.sotrageRegistry.entries()) {
+                    const override = this.stateOverrides[label];
+                    if (override) {
+                        registry.proxy.mut = override
+                    }
+                }
             }
         }
     }
@@ -142,8 +165,7 @@ class DevTools implements DevToolsInterface {
 
 // Dom Inject (required by mute8 DevTools plugin)
 (() => {
-    const tools = new DevTools();
-    window[_WINDOW_KEY] = tools
+    const tools = window[_WINDOW_KEY] = new DevTools();
     if ("open" == getDevToolsStatus()) {
         tools.openDevTools()
     }
