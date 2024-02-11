@@ -133,11 +133,8 @@ class DevTools implements DevToolsInterface {
     }
     private handleMessage(list: DevTypes.Payload[]) {
         for (const p of list) {
-            if (p["host-command"]) {
-                const command = p["host-command"];
-                if (command === 'refresh-host') {
-                    window.location.reload()
-                }
+            if (p.hostCommand === 'refresh-host') {
+                window.location.reload()
             }
         }
     }
