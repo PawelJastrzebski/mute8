@@ -1,4 +1,4 @@
-import { DevToolsOptions, DevToolsInterface, _WINDOW_KEY, DevToolsPrivateTypes as DevTypes, removeCacheJs } from "../packages/mute8-plugins";
+import { DevToolsOptions, DevToolsInterface, DEVTOOLS_KEY, DevToolsPrivateTypes as DevTypes, UI_URL, getDevToolsStatus, setDevToolsStatus } from "./devtools-common";
 import { StoreProxy, Plugin, PluginBuilder, } from "../packages/mute8";
 import { WindowHost } from "../node_modules/cors-window"
 
@@ -12,7 +12,7 @@ const deepFreeze = <T extends Object>(object: T) => {
     return Object.freeze(object) as Readonly<T>
 }
 
-const registryOptionsDefault: DevToolsOptions = {
+const DevToolsOptionsDefault: DevToolsOptions = {
     logger: { logChange: false, logInit: true },
     deepFreaze: true
 }
@@ -24,17 +24,11 @@ interface Registry<T extends Object = any> {
 }
 
 const now = () => new Date().getTime()
-const setDevToolsStatus = (status: "open" | "closed") => localStorage.setItem("dev-tools-opne", status)
-const getDevToolsStatus = () => localStorage.getItem("dev-tools-opne")
-
-// dev: http://localhost:4030/mute8-devtools/
-// prod: https://paweljastrzebski.github.io/mute8-devtools/
-const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
     enable = () => { };
-    disable = () => removeCacheJs();
+    disable = () => localStorage.removeItem(DEVTOOLS_KEY);
     private sotrageRegistry: Map<string, Registry> = new Map();
     private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []
@@ -48,7 +42,7 @@ class DevTools implements DevToolsInterface {
             }
         });
     }
-    register(label: string, options: DevToolsOptions = registryOptionsDefault): PluginBuilder {
+    register(label: string, options: DevToolsOptions = DevToolsOptionsDefault): PluginBuilder {
         const devtools = this;
         return <T extends object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
             const onInit = (v: T) => devtools.setStateInit(label, v)
@@ -174,7 +168,7 @@ class DevTools implements DevToolsInterface {
 
 // Dom Inject (required by mute8 DevTools plugin)
 (() => {
-    const tools = window[_WINDOW_KEY] = new DevTools();
+    const tools = window[DEVTOOLS_KEY] = new DevTools();
     if ("open" == getDevToolsStatus()) {
         tools.openDevTools()
     }

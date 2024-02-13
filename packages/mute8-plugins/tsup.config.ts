@@ -7,6 +7,6 @@ export default defineConfig((options) => {
     ...commonOptions,
     entry: ['mute8-plugins.ts'],
     format: ["esm"],
-    minify: !watch,
+    minify: !watch
   }
 })

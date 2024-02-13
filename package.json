@@ -9,16 +9,16 @@
     "test": "npx jest",
     "lint": "tsc --watch",
     "test:watch": "npx jest --watchAll --maxWorkers=8",
-    "build": "concurrently -n mute8,react,plugins,solid \"npm run build:mute8\" \"npm run build:mute8-react\" \"npm run build:mute8-plugins\" \"npm run build:mute8-solid\"",
+    "build": "npm run build:mute8 && concurrently -n plugins,react,solid,devtools 'npm run build:plugins' 'npm run build:react' 'npm run build:solid'  'npm run devtools' ",
     "build:mute8": "cd ./packages/mute8 && npx tsup",
-    "build:mute8-react": "cd ./packages/mute8-react && npx tsup",
-    "build:mute8-plugins": "cd ./packages/mute8-plugins && npx tsup",
-    "build:mute8-solid": "cd ./packages/mute8-solid && npx tsup",
-    "build:clean": "rm -rf ./packages/mute8/dist && rm -rf ./packages/mute8-react/dist",
+    "build:react": "cd ./packages/mute8-react && npx tsup",
+    "build:plugins": "cd ./packages/mute8-plugins && npx tsup",
+    "build:solid": "cd ./packages/mute8-solid && npx tsup",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react && npm publish ./packages/mute8-plugins",
     "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run && npm publish ./packages/mute8-plugins --dry-run",
-    "devtools:watch": "cd devtools-client && concurrently -n build,host \"npx tsup ./devtools-v1.ts --watch --minify --treeshake --format esm\" \"npx serve dist --cors -p 4040\" "
+    "devtools": "cd devtools-client && npx tsup",
+    "devtools:watch": "cd devtools-client && concurrently -n build,host \"npx tsup --watch\" \"npx serve dist --cors -p 4040\" "
   },
   "engines": {
     "node": ">=21.0.0"

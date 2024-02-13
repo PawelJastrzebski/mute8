@@ -30,19 +30,23 @@ export const CombinePlugins = (...plugins: PluginBuilder[]) => {
 }
 
 // Local Storeage
+interface ILocalStorage {
+    setItem(key: string, value: string): void;
+    getItem(key: string): string | null;
+    removeItem(key: string): void;
+}
 export const LocalStoragePlugin = {
-    new(storageKey: string): PluginBuilder {
-        const setItem = async (value: any) => {
-            localStorage.setItem(storageKey, JSON.stringify(value))
-        }
+    new(storageKey: string, storage: ILocalStorage = localStorage): PluginBuilder {
+        const setItem = async (value: object) => storage.setItem(storageKey, JSON.stringify(value))
+        const getItem = () => storage.getItem(storageKey)
 
-        return <T = object>(proxy: StoreProxy<T, any, any>): Plugin => {
+        return <T = object>(_: StoreProxy<T, any, any>): Plugin => {
             return {
                 BInit: (initState) => {
                     try {
-                        const state = localStorage.getItem(storageKey)
+                        const state = getItem();
                         if (!!state) {
-                            return JSON.parse(state)
+                            initState = JSON.parse(state)
                         }
                     } catch (_) { }
                     return initState
@@ -55,108 +59,23 @@ export const LocalStoragePlugin = {
 }
 
 // DevTool
-export type DevToolsOptions = {
-    logger: {
-        logInit: boolean,
-        logChange: boolean,
-    },
-    deepFreaze: boolean
+import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY, disableDevTools, setDevToolsStatus, DevToolsEnabled } from "../../devtools-client/devtools-common"
+if (DevToolsEnabled()) {
+    await import(SCRIPT_URL as any)
 }
 
-// dev: http://localhost:4040/devtools-v1.mjs
-// prod: https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs
-const SCRIPT_URL = "https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs"
-export const _WINDOW_KEY = "MUTE-8-DEVTOOLS"
-const getCacheJs = () => localStorage.getItem(_WINDOW_KEY)
-const setCacheJs = (code: string) => localStorage.setItem(_WINDOW_KEY, code)
-export const removeCacheJs = () => localStorage.removeItem(_WINDOW_KEY)
-const fetchJs = async (): Promise<void> => {
-    const res = await fetch(SCRIPT_URL)
-    const js = await res.text()
-    setCacheJs(js)
-}
-const injectJs = async (jsCode: string): Promise<void> => {
-    if (!!document.getElementById(_WINDOW_KEY)) {
-        return
-    }
-    return new Promise((resolve, _) => {
-        if (!document || !window) return;
-        var script = document.createElement("script");
-        script.id = _WINDOW_KEY
-        script.type = "module"
-        script.innerText = jsCode
-        document.head.appendChild(script)
-        setTimeout(resolve, 30)
-    })
-}
-
-const js = getCacheJs();
-if (js) {
-    await injectJs(js)
-    fetchJs()
-}
-
-/** ThinClient - call enable() to initialize */
-export interface DevToolsInterface {
-    enable: () => void
-    disable: () => void
-    openDevTools: (globalOptions?: DevToolsOptions) => void;
-    register: (label: string, options?: DevToolsOptions) => PluginBuilder
-}
-
-export const DevTools: DevToolsInterface = window[_WINDOW_KEY] ?? {
-    disable() {
-        removeCacheJs()
-    },
+/** 
+ * ThinClient 
+ * Call enable() to initialize in your code, then [Ctrl + Shift + 8] to Open
+ */
+export const DevTools: DevToolsInterface = window[DEVTOOLS_KEY] ?? {
     enable() {
-        const devtoolsJs = getCacheJs();
-        if (!devtoolsJs) {
-            fetchJs().then(() => window.location.reload())
+        if (!DevToolsEnabled()) {
+            setDevToolsStatus("enabled")
+            window.location.reload()
         }
     },
+    disable() { disableDevTools() },
     register() { return defaultPlugin },
     openDevTools() { },
 } as DevToolsInterface;
-
-export namespace DevToolsPrivateTypes {
-
-    export interface DevToolsInit {
-        definitions: StorageDefintion[],
-        overrides: StateOverrides
-    }
-
-    export interface StorageDefintion {
-        label: string
-    }
-
-    export interface InitState {
-        storageLabel: string,
-        state: object
-        time: number
-    }
-
-    export interface ChangeState {
-        storageLabel: string,
-        oldState: object,
-        newState: object,
-        time: number
-    }
-
-    export interface OverrideState {
-        state: object
-    }
-
-    type StateOverrides = Record<string, OverrideState>;
-
-    export interface Payload {
-        // Host to Dialog
-        init?: DevToolsInit,
-        stateInit?: InitState
-        stateChanged?: ChangeState
-        devtoolsOptions?: DevToolsOptions
-        // Dialog to Host
-        hostCommand?: "refresh-host"
-        stateOverrides?: StateOverrides
-    }
-
-}
