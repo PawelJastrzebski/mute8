@@ -62,13 +62,13 @@ export type DevToolsOptions = {
     },
     deepFreaze: boolean
 }
-
+const SCRIPT_URL = "https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs"
 export const _WINDOW_KEY = "MUTE-8-DEVTOOLS"
 const getCacheJs = () => localStorage.getItem(_WINDOW_KEY)
 const setCacheJs = (code: string) => localStorage.setItem(_WINDOW_KEY, code)
 export const removeCacheJs = () => localStorage.removeItem(_WINDOW_KEY)
 const fetchJs = async (): Promise<void> => {
-    const res = await fetch("http://localhost:4040/devtools-v1.mjs")
+    const res = await fetch(SCRIPT_URL)
     const js = await res.text()
     setCacheJs(js)
 }
@@ -117,6 +117,11 @@ export const DevTools: DevToolsInterface = window[_WINDOW_KEY] ?? {
 
 export namespace DevToolsPrivateTypes {
 
+    export interface DevToolsInit {
+        definitions: StorageDefintion[],
+        overrides: StateOverrides
+    }
+
     export interface StorageDefintion {
         label: string
     }
@@ -138,17 +143,17 @@ export namespace DevToolsPrivateTypes {
         state: object
     }
 
+    type StateOverrides = Record<string, OverrideState>;
+
     export interface Payload {
         // Host to Dialog
-        init?: {}
-        storageDefinitions?: Array<StorageDefintion>
+        init?: DevToolsInit,
         stateInit?: InitState
         stateChanged?: ChangeState
         devtoolsOptions?: DevToolsOptions
         // Dialog to Host
         hostCommand?: "refresh-host"
-        // Both
-        stateOverrides?: Record<string, OverrideState>
+        stateOverrides?: StateOverrides
     }
 
 }

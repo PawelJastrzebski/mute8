@@ -26,12 +26,12 @@ interface Registry<T extends Object = any> {
 const now = () => new Date().getTime()
 const setDevToolsStatus = (status: "open" | "closed") => localStorage.setItem("dev-tools-opne", status)
 const getDevToolsStatus = () => localStorage.getItem("dev-tools-opne")
+const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
     enable = () => { };
     disable = () => removeCacheJs();
-    readonly Mute8DevToolsUIUrl: string = "http://localhost:4030"; // TODO set to prod
     private sotrageRegistry: Map<string, Registry> = new Map();
     private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []
@@ -100,14 +100,14 @@ class DevTools implements DevToolsInterface {
             this.dialogHost.child?.focus()
             return;
         }
-        this.dialogHost = new WindowHost(this.Mute8DevToolsUIUrl, "devtools", {
+        this.dialogHost = new WindowHost(UI_URL, "devtools", {
             height: 550,
-            width: 800,
+            width: 1000,
         })
         this.dialogHost.onMessage = this.handleMessage.bind(this)
-        this.dialogHost.onChildOpen = this.sentInitData.bind(this)
-        this.dialogHost.onChildAttach = this.sentInitData.bind(this)
-        this.dialogHost.onChildClose = () => setDevToolsStatus("closed")
+        this.dialogHost.onChildOpen = this.onDevToolsDialogsOpen.bind(this)
+        this.dialogHost.onChildAttach = this.onDevToolsDialogsOpen.bind(this)
+        this.dialogHost.onChildClose = this.onDevToolsDialogClose.bind(this)
     }
     private postPayload(payload: DevTypes.Payload[]) {
         this.dialogHost?.post(payload)
@@ -134,14 +134,20 @@ class DevTools implements DevToolsInterface {
             }
         }])
     }
-    private sentInitData() {
+    private onDevToolsDialogClose() {
+        setDevToolsStatus("closed")
+        this.handleMessage([{ stateOverrides: {} }])
+    }
+    private onDevToolsDialogsOpen() {
         setDevToolsStatus("open")
         const list = Array.from(this.sotrageRegistry.entries());
-        const all = list.map(([name, _]) => ({ label: name }))
         this.dialogHost!.post([
-            { init: {} },
-            { storageDefinitions: all },
-            { stateOverrides: this.stateOverrides }
+            {
+                init: {
+                    definitions: list.map(([name, _]) => ({ label: name })),
+                    overrides: this.stateOverrides
+                }
+            }
             , ...this.payloadBuffer
         ])
     }
