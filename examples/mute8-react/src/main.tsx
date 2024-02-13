@@ -2,10 +2,10 @@ import './index.css'
 import React, { ReactElement } from 'react'
 import ReactDOM from 'react-dom/client'
 import { newStore } from 'mute8-react'
-
 import Couter from './examples/Counter.tsx'
 import CarStore from './examples/CarStore.tsx'
 import Async from './examples/Async.tsx'
+import { DevTools } from 'mute8-plugins'
 
 type Example = {
   name: string,
@@ -36,15 +36,14 @@ const router = newStore({
     openExample(example: ExampleId) {
       this.currentExample = example
     }
-  }
+  },
+  plugin: DevTools.register("router")
 })
 
 function Logo() {
   const logo = <div></div>
   return (
-    <a target='_blank' href='https://github.com/PawelJastrzebski/mute8'>
-      <div id='logo'>{logo}</div>
-    </a>
+    <div id='logo'>{logo}</div>
   )
 }
 

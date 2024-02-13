@@ -1,7 +1,7 @@
-import { Plugin, PluginBuilder, StoreProxy } from "../mute8/mute8"
+import { Plugin, PluginBuilder, StoreProxy, defaultPlugin } from "../mute8/mute8"
 
 // CombinePlugins Util
-export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilder<T, A, AA>[]) => {
+export const CombinePlugins = (...plugins: PluginBuilder[]) => {
     return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
         const initializedPlugins = plugins.map(p => p(proxy as any)) as Plugin<T>[]
 
@@ -26,24 +26,27 @@ export const CombinePlugins = <T extends Object, A, AA>(...plugins: PluginBuilde
                 }
             }
         }
-
     }
 }
 
 // Local Storeage
+interface ILocalStorage {
+    setItem(key: string, value: string): void;
+    getItem(key: string): string | null;
+    removeItem(key: string): void;
+}
 export const LocalStoragePlugin = {
-    new(storageKey: string) {
-        const setItem = async (value: any) => {
-            localStorage.setItem(storageKey, JSON.stringify(value))
-        }
+    new(storageKey: string, storage: ILocalStorage = localStorage): PluginBuilder {
+        const setItem = async (value: object) => storage.setItem(storageKey, JSON.stringify(value))
+        const getItem = () => storage.getItem(storageKey)
 
-        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
+        return <T = object>(_: StoreProxy<T, any, any>): Plugin => {
             return {
                 BInit: (initState) => {
                     try {
-                        const state = localStorage.getItem(storageKey)
+                        const state = getItem();
                         if (!!state) {
-                            return JSON.parse(state)
+                            initState = JSON.parse(state)
                         }
                     } catch (_) { }
                     return initState
@@ -55,59 +58,24 @@ export const LocalStoragePlugin = {
     }
 }
 
-// DevPlugin
-const deepFreeze = <T extends Object>(object: T) => {
-    for (const name of Object.keys(object)) {
-        const value = object[name];
-        if (!!value && typeof value === "object") {
-            deepFreeze(value);
-        }
-    }
-    return Object.freeze(object) as Readonly<T>
+// DevTool
+import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY, disableDevTools, setDevToolsStatus, DevToolsEnabled } from "../../devtools-client/devtools-common"
+if (DevToolsEnabled()) {
+    await import(SCRIPT_URL as any)
 }
 
-export type DevPluginOptions = {
-    logger: {
-        logInit: boolean,
-        logChange: boolean,
+/** 
+ * ThinClient 
+ * Call enable() to initialize in your code, then [Ctrl + Shift + 8] to Open
+ */
+export const DevTools: DevToolsInterface = window[DEVTOOLS_KEY] ?? {
+    enable() {
+        if (!DevToolsEnabled()) {
+            setDevToolsStatus("enabled")
+            window.location.reload()
+        }
     },
-    deepFreaze: boolean
-}
-const DevPluginOptionsDefault: DevPluginOptions = {
-    logger: { logChange: true, logInit: true },
-    deepFreaze: true
-}
-export const DevPlugin = {
-    new(label: string, options: DevPluginOptions = DevPluginOptionsDefault) {
-        return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
-            return {
-                BInit: (initState) => {
-                    if (options.logger.logInit) {
-                        console.table({
-                            [`${label}-init`]: initState,
-                        })
-                    }
-
-                    if (options.deepFreaze) {
-                        return deepFreeze(initState)
-                    }
-                    return initState
-                },
-                BUpdate: (newState) => {
-                    if (options.deepFreaze) {
-                        return deepFreeze(newState)
-                    }
-                    return newState
-                },
-                AChange: (oldState, newState) => {
-                    if (options.logger.logChange) {
-                        console.table({
-                            [`${label}-old`]: oldState,
-                            [`${label}-new`]: newState
-                        })
-                    }
-                }
-            }
-        }
-    }
-}
+    disable() { disableDevTools() },
+    register() { return defaultPlugin },
+    openDevTools() { },
+} as DevToolsInterface;

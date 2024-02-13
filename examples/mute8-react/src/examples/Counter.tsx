@@ -1,3 +1,4 @@
+import { CombinePlugins, DevTools } from 'mute8-plugins';
 import { newStore } from 'mute8-react'
 
 const store = newStore({
@@ -10,7 +11,8 @@ const store = newStore({
     incrementCounter2(value: number) {
       this.count2 = this.count2 + value;
     }
-  }
+  },
+  plugin: CombinePlugins(DevTools.register("counter"))
 })
 
 setInterval(() => {
@@ -36,7 +38,7 @@ function Couter() {
   return (
     <>
       <h1>{name.length > 0 ? name : "Empty Name"}</h1>
-      <div style={{padding: "20px 0"}} className="card">
+      <div style={{ padding: "20px 0" }} className="card">
         <h4>count is {count}</h4>
         <button onClick={() => setCount2(count2 + 1)}>
           count2 react hook {count2}
