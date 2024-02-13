@@ -62,6 +62,9 @@ export type DevToolsOptions = {
     },
     deepFreaze: boolean
 }
+
+// dev: http://localhost:4040/devtools-v1.mjs
+// prod: https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs
 const SCRIPT_URL = "https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs"
 export const _WINDOW_KEY = "MUTE-8-DEVTOOLS"
 const getCacheJs = () => localStorage.getItem(_WINDOW_KEY)

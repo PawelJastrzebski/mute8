@@ -26,6 +26,9 @@ interface Registry<T extends Object = any> {
 const now = () => new Date().getTime()
 const setDevToolsStatus = (status: "open" | "closed") => localStorage.setItem("dev-tools-opne", status)
 const getDevToolsStatus = () => localStorage.getItem("dev-tools-opne")
+
+// dev: http://localhost:4030/mute8-devtools/
+// prod: https://paweljastrzebski.github.io/mute8-devtools/
 const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
 // Ovverides mute8-plugins implementation of DevTools
