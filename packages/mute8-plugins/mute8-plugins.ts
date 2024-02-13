@@ -61,12 +61,12 @@ export const LocalStoragePlugin = {
 // DevTool
 import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY, disableDevTools, setDevToolsStatus, DevToolsEnabled } from "../../devtools-client/devtools-common"
 if (DevToolsEnabled()) {
-    await import(SCRIPT_URL as any)
+    await import(SCRIPT_URL)
 }
 
 /** 
- * ThinClient 
- * Call enable() to initialize in your code, then [Ctrl + Shift + 8] to Open
+ * DevTools ThinClient 
+ * Call DevTools.enable() in your code to initialize, then press [Ctrl + Shift + 8] in your application window to Open.
  */
 export const DevTools: DevToolsInterface = window[DEVTOOLS_KEY] ?? {
     enable() {

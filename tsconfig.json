@@ -5,15 +5,13 @@
         "moduleResolution": "Node",
         "noImplicitThis": true,
         "declaration": true,
-        "removeComments": true,
+        "removeComments": false,
         "noLib": false,
-        "esModuleInterop": true,
         "noEmit": true,
         "jsx": "react"
     },
     "include": [
-        "packages/mute8-react/mute8-react.ts",
-        "packages/mute8/mute8.ts"
+        "packages/**/**.ts",
     ],
     "exclude": [
         "node_modules"
