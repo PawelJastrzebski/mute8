@@ -1,7 +1,7 @@
 import { PluginBuilder } from "../packages/mute8/dist/mute8";
 
 // env
-export const SCRIPT_URL = "https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs"
+export const SCRIPT_URL = "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 export const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
 // export const SCRIPT_URL = "http://localhost:4040/devtools-v1.mjs"

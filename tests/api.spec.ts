@@ -15,7 +15,7 @@ const testUrl = async (url: string) => {
 
 const HOMEPAGE_URL = "https://paweljastrzebski.github.io/mute8"
 const DEVTOOLS_UI_URL = "https://paweljastrzebski.github.io/mute8-devtools"
-const DEVTOOLS_SCRIPT_URL = "https://raw.githubusercontent.com/PawelJastrzebski/mute8/devtool/devtools-client/dist/devtools-v1.mjs"
+const DEVTOOLS_SCRIPT_URL = "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 
 test('Test Public apis', async () => {
     // Homepage
@@ -28,8 +28,8 @@ test('Test Public apis', async () => {
 
 describe("Validate project files & configuration", () => {
 
-    test('Test /docs/devtools-client', async () => {
-        const file = await fs.readFile("docs/devtools-client/v1.mjs");
+    test('Test /docs/devtools', async () => {
+        const file = await fs.readFile("docs/devtools/v1.mjs");
         const fileContent = file.toString()
 
         expect(fileContent).toContain(DEVTOOLS_UI_URL)
