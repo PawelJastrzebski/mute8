@@ -8,7 +8,7 @@ export default defineConfig((options) => {
     minify: true,
     treeshake: true,
     target: "esnext",
-    entry: ['devtools-v1.ts'],
+    entry: ['v1.ts'],
     format: ["esm"],
   }
 })

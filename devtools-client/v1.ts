@@ -1,6 +1,6 @@
 import { DevToolsOptions, DevToolsInterface, DEVTOOLS_KEY, DevToolsPrivateTypes as DevTypes, UI_URL, getDevToolsStatus, setDevToolsStatus } from "./devtools-common";
-import { StoreProxy, Plugin, PluginBuilder, } from "../packages/mute8";
-import { WindowHost } from "../node_modules/cors-window"
+import { StoreProxy, Plugin, PluginBuilder, } from "../packages/mute8/dist/mute8";
+import { WindowHost } from "cors-window"
 
 const deepFreeze = <T extends Object>(object: T) => {
     for (const name of Object.keys(object)) {
