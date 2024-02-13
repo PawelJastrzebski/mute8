@@ -185,14 +185,14 @@ const config: Config = {
           activeBaseRegex: '/home',
         },
         {
-          type: 'docSidebar',
-          sidebarId: 'home',
+          type: 'doc',
+          docId: 'project/getting-started',
           position: 'left',
           label: 'Project',
         },
         {
           type: 'dropdown',
-          label: 'Packages',
+          label: 'Docs',
           position: 'left',
           // className: "short-dropdown",
           items: [
@@ -205,6 +205,11 @@ const config: Config = {
               type: 'doc',
               label: 'mute8-react',
               docId: 'mute8-react/intro',
+            },
+            {
+              type: 'doc',
+              label: 'mute8-solid',
+              docId: 'mute8-solid/intro',
             },
             {
               type: 'doc',
@@ -225,6 +230,10 @@ const config: Config = {
             {
               label: 'mute8-react',
               href: 'https://www.npmjs.com/package/mute8-react',
+            },
+            {
+              label: 'mute8-solid',
+              href: 'https://www.npmjs.com/package/mute8-solid',
             },
             {
               label: 'mute8-plugins',

@@ -26,7 +26,7 @@ function HeroSection() {
           <p>
             When it comes to coding, remember that "less is more." Build applications swiftly with a streamlined state flow, avoiding unnecessary boilerplate code.
           </p>
-          <Link to={"/mute8/docs/introduction/getting-started"}>
+          <Link to={"/mute8/docs/project/getting-started"}>
             <button className='my-button'>Read More</button>
           </Link>
         </div>

@@ -52,6 +52,13 @@ html[data-theme='dark'] .footer--dark {
   --ifm-footer-background-color: var(--color);
 }
 
+.navbar__toggle {
+  margin-right: 1rem;
+}
+
+button[title='Copy'] svg path {
+  fill: var(--ifm-color-primary-darker);
+}
 
 .my-card {
   padding: 10px;

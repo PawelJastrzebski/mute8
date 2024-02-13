@@ -45,7 +45,7 @@ const store = newStore({
 });
 ```
 
-## Async
+## Asynchronous action
 
 > An asynchronous action is a function designed for handling asynchronous operations, like fetching data from an API. It operates within the context of a small proxy, ensuring, secure manipulation and access to the present state.
 
@@ -64,7 +64,7 @@ const store = newStore({
 });
 ```
 
-## Sub
+## Subscription
 
 > A subscription allows you to observe and react to changes in the state, providing a means to listen for any alterations in the data.
 
@@ -74,7 +74,7 @@ const sub = store.sub((newState) => {
 });
 ```
 
-## Mut
+## Mutation
 
 > Method enabling you to pass an anonymous action and modify the state.
 
