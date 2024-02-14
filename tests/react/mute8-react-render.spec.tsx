@@ -1,14 +1,11 @@
-/**
- * @jest-environment jsdom
- */
 import axios from "axios"
 import React from "react";
-import { render, renderWait, wait } from "./utils"
+import { render, renderWait } from "./utils"
 import { newStore } from "../../packages/mute8-react"
 
 describe("React rendering", () => {
 
-    test('Simple counter', async () => {
+    test('react.useOne()', async () => {
         const store = newStore({
             value: { counter: 1 }
         })
@@ -34,7 +31,7 @@ describe("React rendering", () => {
 
     test('react.select()', async () => {
         const store = newStore({
-            value: { name: "" }
+            value: { name: "-" }
         })
 
         function TestCounter() {
@@ -44,7 +41,7 @@ describe("React rendering", () => {
         // render
         const root = await render(<TestCounter />)
         const getText = () => root.querySelector("#name")?.innerHTML
-        expect(getText()).toEqual("")
+        expect(getText()).toEqual("-")
         // increment
         store.mut(v => v.name = "Hello")
         await renderWait()

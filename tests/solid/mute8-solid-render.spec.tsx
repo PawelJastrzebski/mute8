@@ -1,12 +1,9 @@
-/**
- * @jest-environment jsdom
- */
 import {render, renderWait} from "./utils"
 import { newStore } from "../../packages/mute8-solid"
 
 describe("Solid rendering", () => {
 
-    test('Simple counter', async () => {
+    test('solid.useOne()', async () => {
         const store = newStore({
             value: { counter: 1 }
         })
@@ -28,6 +25,25 @@ describe("Solid rendering", () => {
         store.counter = store.counter + 10
         await renderWait()
         expect(getText()).toEqual("12")
+    });
+
+    test('solid.select()', async () => {
+        const store = newStore({
+            value: { name: "-" }
+        })
+
+        function TestCounter() {
+            const name = store.solid.select(v => v.name)
+            return (<div id="name">{name()}</div>)
+        }
+        // render
+        const root = await render(<TestCounter />)
+        const getText = () => root.querySelector("#name")?.innerHTML
+        expect(getText()).toEqual("-")
+        // increment
+        store.mut(v => v.name = "Hello")
+        await renderWait()
+        expect(getText()).toEqual("Hello")
     });
 
 })

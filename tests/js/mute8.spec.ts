@@ -1,4 +1,4 @@
-import { newStore, Plugin } from "../../packages/mute8/mute8"
+import { newStore, Plugin } from "../../packages/mute8"
 import { wait } from "../utils"
 
 describe("Unit mute8", () => {

@@ -8,12 +8,13 @@
         "removeComments": false,
         "noLib": false,
         "noEmit": true,
-        "rootDir": "./"
+        "rootDir": "../.."
     },
     "include": [
         "**.ts",
     ],
     "exclude": [
-        "**/dist"
+        "**/dist",
+        "**/test"
     ]
 }
