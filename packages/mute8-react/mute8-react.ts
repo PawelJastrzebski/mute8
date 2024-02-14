@@ -1,5 +1,5 @@
 import * as mute8 from "../mute8/mute8"
-import { Store as StoreMute8, StoreDefiniton, ProxyExtension, Plugin } from "../mute8/mute8"
+import { Store as StoreMute8, StoreDefiniton, ProxyExtension } from "../mute8/mute8"
 import { useState, useEffect } from 'react';
 
 interface ReactExtension<T> {
@@ -12,26 +12,26 @@ export type Store<T, A, AA> = StoreMute8<T, A, AA> & {
 }
 
 export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA>) => {
-    const reactExtension:  ProxyExtension<T, A, AA> = {
+    const reactExtension: ProxyExtension<T, A, AA> = {
         name: "react",
         init(core) {
             return {
                 use() {
-                    const [value, setValue] = useState(core.s());
+                    const [value, setValue] = useState(core.s.sanp());
                     useEffect(() => {
-                        const sub = core.sub((s) => setValue(s))
+                        const sub = core.s.sub((s) => setValue(s))
                         return () => sub.destroy()
                     }, [])
-        
-                    return [value, (v: any) => core.u(v)]
+
+                    return [value, (v: any) => core.s.next(v)]
                 },
                 useOne(property: keyof T) {
-                    const [value, setValue] = useState((core.s() as any)[property]);
+                    const [value, setValue] = useState((core.s.sanp() as any)[property]);
                     useEffect(() => {
-                        const sub = core.sub((s: any) => setValue(s[property]))
+                        const sub = core.s.sub((s: any) => setValue(s[property]))
                         return () => sub.destroy()
                     }, [])
-                    return [value, (v: any) => core.uv(property, v)]
+                    return [value, (v: any) => core.update(property, v)]
                 }
             }
         },

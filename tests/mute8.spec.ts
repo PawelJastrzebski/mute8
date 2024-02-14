@@ -54,7 +54,7 @@ describe("Unit mute8", () => {
         }
 
         // event is fired lazy
-        await wait(1);
+        await wait(10);
         expect(subFired).toEqual(1)
         sub.destroy();
     });
@@ -189,6 +189,27 @@ describe("Unit mute8", () => {
         expect(state.counter).toEqual(2)
     });
 
+
+    test('Selector', async () => {
+        const state = newStore({
+            value: {
+                counter: 1
+            }
+        })
+
+        // select
+        const c1 = state.select((v) => v.counter)
+        expect(c1.sanp()).toEqual(1)
+        const c2 = state.select((v) => ({ ok: v.counter }))
+        expect(c2.sanp().ok).toEqual(1)
+        // update parent
+        state.counter = 2;
+        await wait(10)
+        //assert
+        expect(c1.sanp()).toEqual(2)
+        expect(c2.sanp().ok).toEqual(2)
+    });
+
 })
 
 test('Example car store', async () => {
@@ -294,7 +315,7 @@ test('Async actions', async () => {
 describe("Plugin", () => {
 
     test('Empty Plugin', async () => {
-        const empty: Plugin = {
+        const empty: Plugin<any> = {
             BInit: function (initState: any) {
                 return initState
             },
@@ -309,7 +330,7 @@ describe("Plugin", () => {
                 count: 1,
             },
             plugin: (core) => {
-                expect(core.snap().count).toEqual(1)
+                expect((core.snap() as any).count).toEqual(1)
                 return empty;
             }
         })

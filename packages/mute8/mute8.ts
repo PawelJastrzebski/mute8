@@ -5,8 +5,9 @@ const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;
+const isObject = (a: any) => typeof a == "object"
 
-export interface Plugin<T extends Object = {}> {
+export interface Plugin<T> {
     /** BeforeInit() */
     BInit(initState: T): T
     /** BeforeUpdate() */
@@ -14,45 +15,114 @@ export interface Plugin<T extends Object = {}> {
     /** AfterChange() */
     AChange(oldState: Readonly<T>, newState: T): void
 }
-export const defaultPlugin: () => Plugin = () => ({
+export const defaultPlugin: <T>() => Plugin<T> = () => ({
     BInit: (v) => v,
     BUpdate: (v) => v,
     AChange: (v1, v2) => { }
 })
 
-class StoreCore<T, A, AA> {
+class Subject<T> {
     private id: number = 0; // subscription id
     private c: Record<number, SubFn<T>> = {} // subscription container
-    private i: Readonly<T> // current state
     private t: NodeJS.Timeout // sub triger
+    private s: Readonly<T> // current state
+    private p: Plugin<T>
+    private ps: Sub | null // parent sub
+
+    constructor(
+        state: T,
+        plugin?: Plugin<T>
+    ) {
+        this.p = plugin ?? defaultPlugin()
+        this.s = freeze(this.p.BInit(state))
+    }
+
+    /** notifySubs() */
+    private ns(): void {
+        O.keys(this.c).forEach(id => this.c[id](this.s))
+    }
+
+    destroy() {
+        this.ps?.destroy()
+        this.ps = null
+    }
+
+    sanp(): Readonly<T> {
+        return this.s
+    }
+
+    sub(fn: SubFn<T>): Sub {
+        const id = this.id++
+        this.c[id] = fn
+        return {
+            destroy: () => delete this.c[id]
+        }
+    }
+
+    next(update: Partial<T>): void {
+        if (!isObject(this.s)) {
+            if (this.s !== update) {
+                this.s = update as T
+                this.ns()
+            }
+            return
+        }
+
+        const newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
+        if (toJson(this.s) !== toJson(newFinal)) {
+            clearTimeout(this.t);
+            this.p.AChange(this.s, newFinal)
+            this.s = freeze(newFinal)
+            this.t = setTimeout(this.ns.bind(this), 0);
+        }
+    }
+
+    select<O>(fn: (value: Readonly<T>) => O): Observer<O> {
+        const subject = new Subject(fn(this.sanp()))
+        subject.ps = this.sub((v) => subject.next(fn(v)))
+        return subject;
+    }
+}
+
+interface Observer<T> {
+    sub(fn: SubFn<T>): Sub
+    select<O>(fn: (value: Readonly<T>) => O): Observer<O>
+    sanp(): Readonly<T>
+    destroy(): void
+}
+
+class StoreCore<T, A, AA> {
+    readonly s: Subject<T>
     private a: A // actions
     private ap: any // actions proxy
     private aa: AA // async action
     private aap: any // async action proxy
     readonly bp: StoreProxy<T, A, AA>; // big proxy
-    private p: Plugin<T>
 
-    constructor(inner: T, actions: A, aactions: AA, plugin?: (bp: StoreProxy<T, A, AA>) => Plugin<T>) {
-        this.i = freeze(assign({}, inner))
+    constructor(state: T, actions: A, aactions: AA, plugin?: PluginBuilder) {
+        this.s = new Subject(state)
         this.a = freeze(actions);
         this.ap = freeze(buildActionsProxy(this.aFn.bind(this)))
         this.aa = freeze(aactions);
         this.aap = freeze(buildActionsProxy(this.aaFn.bind(this)))
+
         // init big proxy
         const core = this;
         this.bp = {
-            snap: core.s.bind(core),
-            sub: core.sub.bind(core),
+            snap: () => core.s.sanp(),
+            sub: (v) => core.s.sub(v),
+            select: (f) => core.s.select(f),
+            actions: core.ap,
             async: core.aap,
-            actions: this.ap,
             /** @ts-ignore */
-            set mut(v: Partial<T>) { core.u(v) },
+            set mut(v: Partial<T>) { core.s.next(v) },
             /** @ts-ignore */
-            get mut() { return core.mutFn.bind(core) }
+            get mut() { return core.mut.bind(core) }
         }
+
         // init plugin
-        this.p = (plugin ?? defaultPlugin)(this.bp) as Plugin<T>
-        this.i = freeze(this.p.BInit(assign({}, inner)))
+        const p = (plugin ?? defaultPlugin)(this.bp);
+        this.s = new Subject(state, p)
     }
 
     /** getAsyncActionFunction() */
@@ -65,52 +135,22 @@ class StoreCore<T, A, AA> {
     aFn(action_name: string | symbol): Function {
         const action_fn = this.a[action_name]
         return (...args: any[]) => {
-            const state = deepClone(this.s())
+            const state = deepClone(this.s.sanp())
             action_fn.bind(state)(...args)
-            this.u(state)
+            this.s.next(state)
         }
     }
 
-    mutFn(fn: (v: T) => void): void {
-        const state = deepClone(this.s())
+    mut(fn: (v: T) => void): void {
+        const state = deepClone(this.s.sanp())
         fn(state)
-        this.u(state)
-    }
-
-    /** update() */
-    u(newState: Partial<T>): void {
-        const newFinal = this.p.BUpdate(assign(deepClone(this.i), newState))
-        if (toJson(this.i) !== toJson(newFinal)) {
-            clearTimeout(this.t);
-            this.p.AChange(this.i, newFinal)
-            this.i = freeze(newFinal)
-            this.t = setTimeout(this.ns.bind(this), 0);
-        }
+        this.s.next(state)
     }
 
     /** updateValue() */
-    uv(key: any, value: any): void {
-        this.u({ [key]: value } as any)
-    }
-
-    /** notifySubs() */
-    private ns(): void {
-        for (const id of O.keys(this.c)) {
-            this.c[id](this.i)
-        }
-    }
-
-    /** snap() */
-    s(): Readonly<T> {
-        return this.i
-    }
-
-    sub(fn: SubFn<T>): Sub {
-        const id = this.id++
-        this.c[id] = fn
-        return {
-            destroy: () => delete this.c[id]
-        }
+    update(key: any, value: any): void {
+        if (key === "mut") return this.s.next(value)
+        this.s.next({ [key]: value } as Partial<T>)
     }
 }
 
@@ -130,6 +170,7 @@ interface SmalProxy<T, A> {
 }
 export interface StoreProxy<T, A, AA> extends SmalProxy<T, A> {
     sub(fn: SubFn<T>): Sub
+    select<O>(fn: (value: Readonly<T>) => O): Observer<O>
     async: Readonly<AA>
 }
 export interface ProxyExtension<T, A, AA> {
@@ -141,22 +182,22 @@ export interface ProxyExtension<T, A, AA> {
 * Use Only for internal ProxyExtension
 */
 export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
-    const core = new StoreCore(state.value, state.actions ?? {}, state.async ?? {}, state.plugin)
-    const extension = !ext ? {} : { [ext.name]: ext.init(core as any) } as {}
+    const core = new StoreCore(
+        state.value,
+        state.actions ?? {},
+        state.async ?? {},
+        state.plugin
+    )
+    const extension = !ext ? {} : { [ext.name]: ext.init(core as StoreCore<any, any, any>) } as {}
     const bigProxy = assign(extension, core.bp)
-
     return new Proxy({}, {
         get(_, prop) {
             const p = bigProxy[prop];
             if (!!p) return p
-            return core.s()[prop]
+            return core.s.sanp()[prop]
         },
         set(_, prop, value) {
-            if (prop === 'mut') {
-                core.u(value)
-            } else {
-                core.uv(prop, value)
-            }
+            core.update(prop, value)
             return true
         },
     }) as any
@@ -164,7 +205,7 @@ export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: P
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
-export type PluginBuilder<T = object> = (proxy: StoreProxy<T, any, any>) => Plugin
+export type PluginBuilder = <T>(proxy: StoreProxy<T, any, any>) => Plugin<T>
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export type Sub = { destroy(): void }
