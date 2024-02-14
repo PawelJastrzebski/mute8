@@ -8,13 +8,12 @@
         "removeComments": false,
         "noLib": false,
         "noEmit": true,
-        "jsx": "react"
+        "rootDir": "./"
     },
     "include": [
-        "packages/**/**.ts",
+        "**.ts",
     ],
     "exclude": [
-        "**/dist",
-        "node_modules"
+        "**/dist"
     ]
 }

@@ -1,5 +1,5 @@
 import axios from "axios"
-import { failed } from "./utils"
+import { failed } from "../utils"
 import * as fs from "fs/promises"
 
 const testUrl = async (url: string) => {

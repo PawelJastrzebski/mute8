@@ -1,4 +1,4 @@
-import { newStore, Plugin } from "../packages/mute8"
+import { newStore, Plugin } from "../../packages/mute8/dist/mute8"
 
 test('Empty Plugin', async () => {
     const empty: Plugin<any> = {

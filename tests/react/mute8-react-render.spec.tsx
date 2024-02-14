@@ -4,7 +4,7 @@
 import axios from "axios"
 import React from "react";
 import { render, renderWait, wait } from "./utils"
-import { newStore } from "../packages/mute8-react/mute8-react"
+import { newStore } from "../../packages/mute8-react"
 
 describe("React rendering", () => {
 
