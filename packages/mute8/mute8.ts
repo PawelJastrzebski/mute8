@@ -141,7 +141,7 @@ class StoreCore<T, A, AA> {
 
 const buildActionProxy = <T>(actions: T, proxy: (fnName: string, fn: Function) => Function): T => {
     const aProxy: Record<string, Function> = {}
-    O.entries(actions).forEach(([name, fn]) => aProxy[name] = proxy(name, fn))
+    O.entries(actions as object).forEach(([name, fn]) => aProxy[name] = proxy(name, fn))
     return freeze(aProxy) as T
 }
 
@@ -165,7 +165,7 @@ export interface ProxyExtension<T, A, AA> {
 /**  
 * Use Only for internal ProxyExtension
 */
-export const newStoreProxy = <T, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
+export const newStoreProxy = <T extends object, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
     const core = new StoreCore(
         state.value,
         state.actions ?? {},
@@ -197,12 +197,12 @@ export type Sub = { destroy(): void }
 
 export type VoidFn = ((...args: any) => undefined)
 export type AsyncFn = ((...args: any) => Promise<void>);
-export interface StoreDefiniton<T extends Object, A, AA> {
+export interface StoreDefiniton<T extends object, A, AA> {
     value: T & object & ExcludeKeys
     actions?: A & ThisType<T> & Record<string, VoidFn>
     async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
     plugin?: PluginBuilder
 }
-export const newStore = <T, A, AA>(state: StoreDefiniton<T, A, AA>) => {
+export const newStore = <T extends object, A, AA>(state: StoreDefiniton<T, A, AA>) => {
     return newStoreProxy(state) as Store<T, A, AA>
 }

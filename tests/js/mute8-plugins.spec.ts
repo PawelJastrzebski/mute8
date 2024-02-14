@@ -23,17 +23,23 @@ test('Empty Plugin', async () => {
     expect(store.count).toEqual(1)
 })
 
+// import { DevTools, CombinePlugins, LocalStoragePlugin } from "../../packages/mute8-plugins/mute8-plugins.ts"
+test('TODO jest error - SyntaxError: await is only valid in async functions and the top level bodies of modules', async () => {
+    // const { DevTools, CombinePlugins, LocalStoragePlugin } = await import("../../packages/mute8-plugins/mute8-plugins.ts")
 
-// import { DevTools, CombinePlugins, LocalStoragePlugin } from "../packages/mute8-plugins/mute8-plugins"
-// test('TODO jest error - SyntaxError: await is only valid in async functions and the top level bodies of modules', async () => {
-//     const store = newStore({
-//         value: {
-//             status: "init"
-//         },
-//         plugin: CombinePlugins(
-//             LocalStoragePlugin.new("async-users"),
-//             DevTools.register("async-users")
-//         )
-//     })
-//     expect(store.status).toEqual("init")
-// })
+
+    // @see tsconfig -  "allowImportingTsExtensions": true,
+    // https://jestjs.io/docs/configuration#extensionstotreatasesm-arraystring
+    // https://jestjs.io/docs/ecmascript-modules
+
+    // const store = newStore({
+    //     value: {
+    //         status: "init"
+    //     },
+    //     plugin: CombinePlugins(
+    //         LocalStoragePlugin.new("async-users"),
+    //         DevTools.register("async-users")
+    //     )
+    // })
+    // expect(store.status).toEqual("init")
+})
