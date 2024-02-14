@@ -2,7 +2,7 @@ import { Plugin, PluginBuilder, StoreProxy, defaultPlugin } from "../mute8/mute8
 
 // CombinePlugins Util
 export const CombinePlugins = (...plugins: PluginBuilder[]) => {
-    return <T extends Object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
+    return <T>(proxy: StoreProxy<T, any, any>): Plugin<T> => {
         const initializedPlugins = plugins.map(p => p(proxy as any)) as Plugin<T>[]
 
         return {
@@ -40,7 +40,7 @@ export const LocalStoragePlugin = {
         const setItem = async (value: object) => storage.setItem(storageKey, JSON.stringify(value))
         const getItem = () => storage.getItem(storageKey)
 
-        return <T = object>(_: StoreProxy<T, any, any>): Plugin => {
+        return <T>(_: StoreProxy<T, any, any>): Plugin<any> => {
             return {
                 BInit: (initState) => {
                     try {

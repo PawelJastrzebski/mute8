@@ -17,7 +17,7 @@
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react && npm publish ./packages/mute8-plugins",
     "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run && npm publish ./packages/mute8-plugins --dry-run",
-    "devtools": "cd devtools-client && npx tsup && mv dist/ ../docs/devtools/",
+    "devtools": "cd devtools-client && npx tsup && mv -f dist/ ../docs/devtools/",
     "devtools:watch": "cd devtools-client && concurrently -n build,host \"npx tsup --watch\" \"npx serve dist --cors -p 4040\" "
   },
   "engines": {

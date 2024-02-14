@@ -10,9 +10,7 @@ describe("React rendering", () => {
 
     test('Simple counter', async () => {
         const store = newStore({
-            value: {
-                counter: 1
-            }
+            value: { counter: 1 }
         })
 
         function TestCounter() {
@@ -34,11 +32,28 @@ describe("React rendering", () => {
         expect(getText()).toEqual("12")
     });
 
+    test('react.select()', async () => {
+        const store = newStore({
+            value: { name: "" }
+        })
+
+        function TestCounter() {
+            const name = store.react.select(v => v.name)
+            return (<div id="name">{name}</div>)
+        }
+        // render
+        const root = await render(<TestCounter />)
+        const getText = () => root.querySelector("#name")?.innerHTML
+        expect(getText()).toEqual("")
+        // increment
+        store.mut(v => v.name = "Hello")
+        await renderWait()
+        expect(getText()).toEqual("Hello")
+    });
+
     test('Dispatch action by click', async () => {
         const store = newStore({
-            value: {
-                counter: 1
-            },
+            value: { counter: 1 },
             actions: {
                 inc(num: number) {
                     this.counter = this.counter + num;

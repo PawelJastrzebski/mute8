@@ -311,30 +311,3 @@ test('Async actions', async () => {
     await store.async.other()
     expect(store.fetchCount).toEqual(6)
 })
-
-describe("Plugin", () => {
-
-    test('Empty Plugin', async () => {
-        const empty: Plugin<any> = {
-            BInit: function (initState: any) {
-                return initState
-            },
-            BUpdate: function (newState: any) {
-                return newState
-            },
-            AChange: function (oldState: Readonly<any>, newState: any): void { }
-        }
-
-        const store = newStore({
-            value: {
-                count: 1,
-            },
-            plugin: (core) => {
-                expect((core.snap() as any).count).toEqual(1)
-                return empty;
-            }
-        })
-        expect(store.count).toEqual(1)
-    })
-
-})

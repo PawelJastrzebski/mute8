@@ -77,7 +77,7 @@ class Subject<T> {
         }
     }
 
-    select<O>(fn: (value: Readonly<T>) => O): Observer<O> {
+    select<O>(fn: SelectFn<T, O>): Observer<O> {
         const subject = new Subject(fn(this.sanp()))
         subject.ps = this.sub((v) => subject.next(fn(v)))
         return subject;
@@ -86,34 +86,35 @@ class Subject<T> {
 
 interface Observer<T> {
     sub(fn: SubFn<T>): Sub
-    select<O>(fn: (value: Readonly<T>) => O): Observer<O>
+    select<O>(fn: SelectFn<T, O>): Observer<O>
     sanp(): Readonly<T>
     destroy(): void
 }
 
 class StoreCore<T, A, AA> {
     readonly s: Subject<T>
-    private a: A // actions
-    private ap: any // actions proxy
-    private aa: AA // async action
-    private aap: any // async action proxy
     readonly bp: StoreProxy<T, A, AA>; // big proxy
 
     constructor(state: T, actions: A, aactions: AA, plugin?: PluginBuilder) {
         this.s = new Subject(state)
-        this.a = freeze(actions);
-        this.ap = freeze(buildActionsProxy(this.aFn.bind(this)))
-        this.aa = freeze(aactions);
-        this.aap = freeze(buildActionsProxy(this.aaFn.bind(this)))
-
+        const asyncProxy = buildActionProxy(aactions, (_, fn) => {
+            return async (...args: any[]) => await fn.bind(this.bp)(...args)
+        })
+        const actionsProxy = buildActionProxy(actions, (_, fn) => {
+            return (...args: any[]) => {
+                const state = deepClone(this.s.sanp())
+                fn.bind(state)(...args)
+                this.s.next(state)
+            }
+        })
         // init big proxy
         const core = this;
         this.bp = {
             snap: () => core.s.sanp(),
             sub: (v) => core.s.sub(v),
             select: (f) => core.s.select(f),
-            actions: core.ap,
-            async: core.aap,
+            actions: actionsProxy,
+            async: asyncProxy,
             /** @ts-ignore */
             set mut(v: Partial<T>) { core.s.next(v) },
             /** @ts-ignore */
@@ -123,22 +124,6 @@ class StoreCore<T, A, AA> {
         // init plugin
         const p = (plugin ?? defaultPlugin)(this.bp);
         this.s = new Subject(state, p)
-    }
-
-    /** getAsyncActionFunction() */
-    aaFn(action_name: string | symbol): Function {
-        const action_fn = this.aa[action_name]
-        return action_fn.bind(this.bp)
-    }
-
-    /** getActionFunction() */
-    aFn(action_name: string | symbol): Function {
-        const action_fn = this.a[action_name]
-        return (...args: any[]) => {
-            const state = deepClone(this.s.sanp())
-            action_fn.bind(state)(...args)
-            this.s.next(state)
-        }
     }
 
     mut(fn: (v: T) => void): void {
@@ -154,12 +139,11 @@ class StoreCore<T, A, AA> {
     }
 }
 
-// Actions Proxy
-const buildActionsProxy = (fn: (action_name: string | symbol) => Function) => (
-    new Proxy({}, {
-        get(_, action_name) { return fn(action_name) },
-    })
-)
+const buildActionProxy = <T>(actions: T, proxy: (fnName: string, fn: Function) => Function): T => {
+    const aProxy: Record<string, Function> = {}
+    O.entries(actions).forEach(([name, fn]) => aProxy[name] = proxy(name, fn))
+    return freeze(aProxy) as T
+}
 
 // Proxy
 interface SmalProxy<T, A> {
@@ -208,6 +192,7 @@ type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, 
 export type PluginBuilder = <T>(proxy: StoreProxy<T, any, any>) => Plugin<T>
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
+export type SelectFn<T, O> = (value: Readonly<T>) => O
 export type Sub = { destroy(): void }
 
 export type VoidFn = ((...args: any) => undefined)
