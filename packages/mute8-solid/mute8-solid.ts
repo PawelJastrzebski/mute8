@@ -12,7 +12,7 @@ export type Store<T, A, AA> = StoreMute8<T, A, AA> & {
 }
 
 export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA>) => {
-    const reactExtension: ProxyExtension<T, A, AA> = {
+    const extension: ProxyExtension<T, A, AA> = {
         name: "solid",
         init(core) {
             return {
@@ -39,7 +39,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
         },
     }
 
-    return newStoreProxy(store as any, reactExtension) as Store<T, A, AA>
+    return newStoreProxy(store as any, extension) as Store<T, A, AA>
 }
 
 export { SubFn, VoidFn, AsyncFn, Sub, Plugin } from "../mute8/mute8"

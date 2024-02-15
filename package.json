@@ -14,6 +14,7 @@
     "build:react": "cd ./packages/mute8-react && npx tsup",
     "build:plugins": "cd ./packages/mute8-plugins && npx tsup",
     "build:solid": "cd ./packages/mute8-solid && npx tsup",
+    "build:angular": "cd ./packages/mute8-angular && npx tsup",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "npm publish ./packages/mute8 && npm publish ./packages/mute8-react && npm publish ./packages/mute8-plugins",
     "publish:npm:test": "npm publish ./packages/mute8 --dry-run && npm publish ./packages/mute8-react --dry-run && npm publish ./packages/mute8-plugins --dry-run",
@@ -28,7 +29,8 @@
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "solid-js": "^1.8.14"
+    "solid-js": "^1.8.14",
+    "@angular/core": "^17.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",
