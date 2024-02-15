@@ -11,6 +11,6 @@ import { CounterService } from './components/counter/counter.component';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
+  title = 'mute8-angular'
   counter = inject(CounterService)
-
 }
