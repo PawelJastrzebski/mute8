@@ -1,9 +1,9 @@
 import { Store as StoreMute8, StoreDefiniton, ProxyExtension, newStoreProxy, SelectFn } from "../mute8/mute8"
-import { signal, computed, effect, WritableSignal, Signal } from '@angular/core';
+import { signal, effect, Signal } from '@angular/core';
 
 interface AngularExtension<T> {
-    use(): WritableSignal<T>
-    useOne<K extends keyof T>(property: K): WritableSignal<T[K]>
+    use(): Signal<T>
+    useOne<K extends keyof T>(property: K): Signal<T[K]>
     select<O>(fn: SelectFn<T, O>): Signal<O>
 }
 
@@ -23,8 +23,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                         const sub = core.s.sub(s => sig.set(s))
                         onCleanup(() => sub.destroy())
                     }, options)
-                    computed(() => core.s.next(sig()))
-                    return sig
+                    return sig.asReadonly()
                 },
                 useOne(property: keyof T) {
                     const sig = signal((core.s.sanp() as any)[property]);
@@ -32,8 +31,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                         const sub = core.s.sub(s => sig.set(s[property]))
                         onCleanup(() => sub.destroy())
                     }, options)
-                    computed(() => core.update(property, sig()))
-                    return sig
+                    return sig.asReadonly()
                 },
                 select<O>(fn: SelectFn<T, O>) {
                     const sig = signal(fn(core.s.sanp()));

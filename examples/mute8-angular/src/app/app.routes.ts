@@ -1,11 +1,15 @@
 import { Routes } from '@angular/router';
-import { CouterComponent } from './components/couter/couter.component';
 import { AsyncComponent } from './components/async/async.component';
+import { CounterComponent } from './components/counter/counter.component';
 
 export const routes: Routes = [
   {
+    path: "",
+    component: CounterComponent
+  },
+  {
     path: "counter",
-    component: CouterComponent
+    component: CounterComponent
   },
   {
     path: "async",

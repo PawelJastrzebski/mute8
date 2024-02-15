@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "r": "rm -rf node_modules && rm package-lock.json && npm i && npm run start"
+    "r": "rm -rf .angular && rm -rf node_modules && rm -f package-lock.json && npm i && npm run start"
   },
   "private": true,
   "dependencies": {
@@ -19,7 +19,7 @@
     "@angular/platform-browser": "^17.1.0",
     "@angular/platform-browser-dynamic": "^17.1.0",
     "@angular/router": "^17.1.0",
-    "mute8-angular": "file:./src/mute8-angular",
+    "mute8-angular": "file:./mute8-angular",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

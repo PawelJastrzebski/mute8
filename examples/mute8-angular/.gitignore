@@ -3,6 +3,7 @@
 # Compiled output
 /dist
 /tmp
+/mute8-angular
 /out-tsc
 /bazel-out
 
