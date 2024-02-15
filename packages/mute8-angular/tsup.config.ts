@@ -6,6 +6,6 @@ export default defineConfig((options) => {
   return {
     ...commonOptions,
     entry: ['mute8-angular.ts'],
-    minify: false
+    minify: !watch
   }
 })

@@ -3,6 +3,25 @@ import { wait } from "./utils"
 
 describe("Unit mute8", () => {
 
+    test('test performance', () => {
+        const name = "expected: 600ms >";
+        const store = newStore({
+            value: {
+                name: "ok"
+            }
+        })
+
+        console.time(name)
+        for (let index = 0; index < 1000_000_000; index++) {
+            const x = store.name;
+        }
+        console.timeEnd(name)
+
+        expect(store).toBeTruthy()
+        expect(store.name).toEqual("ok")
+    });
+
+
     test('Init state', () => {
         const store = newStore({
             value: {

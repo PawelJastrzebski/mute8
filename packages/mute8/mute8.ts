@@ -5,6 +5,7 @@ const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;
+const defineProperty = O.defineProperty;
 const isObject = (a: any) => typeof a == "object"
 
 export interface Plugin<T> {
@@ -174,17 +175,23 @@ export const newStoreProxy = <T extends object, A, AA>(state: StoreDefiniton<T, 
     )
     const extension = !ext ? {} : { [ext.name]: ext.init(core as StoreCore<any, any, any>) } as {}
     const bigProxy = assign(extension, core.bp)
-    return new Proxy({}, {
-        get(_, prop) {
-            const p = bigProxy[prop];
-            if (!!p) return p
-            return core.s.sanp()[prop]
-        },
-        set(_, prop, value) {
-            core.update(prop, value)
-            return true
-        },
-    }) as any
+
+    // build store representation
+    const store = {}
+    for (const [key, _] of Object.entries(state.value)) {
+        defineProperty(store, key, {
+            get() { return core.s.sanp()[key] },
+            set(v) {
+                core.update(key, v)
+                return true
+            }
+        })
+    }
+    defineProperty(store, "mut", {
+        get() { return core.mut.bind(core) },
+        set(v: any) { core.s.next(v) }
+    })
+    return freeze(assign(store, bigProxy)) as any
 }
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
