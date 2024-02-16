@@ -5,9 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:preview": "npx serve dist/mute8-angular/browser --cors -p 4044",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "r": "rm -rf .angular && rm -rf node_modules && rm -f package-lock.json && npm i && npm run start"
+    "reset": "rm -rf .angular && rm -rf node_modules && rm -f package-lock.json && npm i && npm run start"
   },
   "private": true,
   "dependencies": {
@@ -20,7 +21,9 @@
     "@angular/platform-browser-dynamic": "^17.1.0",
     "@angular/router": "^17.1.0",
     "mute8-angular": "file:./mute8-angular",
+    "mute8-plugins": "file:../../packages/mute8-plugins",
     "rxjs": "~7.8.0",
+    "serve": "^14.2.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
   },

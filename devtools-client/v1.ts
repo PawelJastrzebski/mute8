@@ -27,8 +27,7 @@ const now = () => new Date().getTime()
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
-    enable = () => { };
-    disable = () => localStorage.removeItem(DEVTOOLS_KEY);
+    import = async () => { };
     private sotrageRegistry: Map<string, Registry> = new Map();
     private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []

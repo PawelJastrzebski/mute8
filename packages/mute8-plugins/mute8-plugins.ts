@@ -2,7 +2,7 @@ import { Plugin, PluginBuilder, StoreProxy } from "../mute8/mute8"
 
 // CombinePlugins Util
 export const CombinePlugins = (...plugins: PluginBuilder[]): PluginBuilder => {
-    return <T>(proxy: StoreProxy<T, any, any>): Plugin<T> => {
+    return <T extends object>(proxy: StoreProxy<T, any, any>): Plugin<T> => {
         const initializedPlugins = plugins
             .map(p => p?.(proxy))
             .filter(p => !!p) as Plugin<T>[]
@@ -61,23 +61,29 @@ export const LocalStoragePlugin = {
 }
 
 // DevTool
-import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY, disableDevTools, setDevToolsStatus, DevToolsEnabled } from "../../devtools-client/devtools-common"
-if (DevToolsEnabled()) {
-    await import(SCRIPT_URL)
-}
+import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY } from "../../devtools-client/devtools-common"
 
 /** 
- * DevTools ThinClient 
- * Call DevTools.enable() in your code to initialize, then press [Ctrl + Shift + 8] in your application window to Open.
+* DevTools ThinClient
+*
+* Call `await DevTools.enable()` on top of your file to initialize it.
+* Press [Ctrl + Shift + 8] in your application window to open the DevTools.
  */
 export const DevTools: DevToolsInterface = window[DEVTOOLS_KEY] ?? {
-    enable() {
-        if (!DevToolsEnabled()) {
-            setDevToolsStatus("enabled")
-            window.location.reload()
-        }
+    async import() {
+        await import(SCRIPT_URL /* @vite-ignore */)
     },
-    disable() { disableDevTools() },
     register() { return null as PluginBuilder },
     openDevTools() { },
 } as DevToolsInterface;
+
+/** 
+ * If your build doesn't support top-level `await` to call `await DevTools.enable()`, import this script at the top of your file or in HTML head section.
+ * 
+ * Example:
+ * import "<DEV_TOOLS_SCRIPT_URL>" * 
+ * 
+ * Example:
+ * <script type="module" src="<DEV_TOOLS_SCRIPT_URL>" ></script>
+ */
+export const DEV_TOOLS_SCRIPT_URL = SCRIPT_URL

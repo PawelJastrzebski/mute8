@@ -90,7 +90,7 @@ interface Observer<T> {
     destroy(): void
 }
 
-class StoreCore<T, A, AA> {
+class StoreCore<T extends object, A, AA> {
     readonly s: Subject<T>
     readonly p: StoreProxy<T, A, AA>; // proxy
 
@@ -155,7 +155,7 @@ export interface StoreProxy<T, A, AA> extends SmalProxy<T, A> {
     select<O>(fn: (value: Readonly<T>) => O): Observer<O>
     async: Readonly<AA>
 }
-export interface ProxyExtension<T, A, AA> {
+export interface ProxyExtension<T extends object, A, AA> {
     name: string,
     init(core: StoreCore<T, A, AA>): object
 }
@@ -190,7 +190,7 @@ export const buildProxy = <T extends object, A, AA>(state: StoreDefiniton<T, A, 
 
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
-export type PluginBuilder = (<T>(proxy: StoreProxy<T, any, any>) => Plugin<T>) | null
+export type PluginBuilder = (<T extends object>(proxy: StoreProxy<T, any, any>) => Plugin<T>) | null
 export type Store<T, A, AA> = StoreProxy<T, A, AA> & T
 export type SubFn<T> = (value: Readonly<T>) => void
 export type SelectFn<T, O> = (value: Readonly<T>) => O

@@ -18,14 +18,14 @@ const store = newStore({
 setInterval(() => {
   store.count = store.count + 100;
   store.count = store.count + 100;
-}, 10)
+}, 50)
 
 setInterval(() => {
   store.count = store.count + 1;
   store.count = Math.floor(store.count * 2)
 
   store.count2 = store.count2 + 1000;
-}, 10)
+}, 50)
 
 // state.sub((v) => console.log(v.count))
 

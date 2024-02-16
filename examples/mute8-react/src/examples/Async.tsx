@@ -1,6 +1,5 @@
 import { newStore } from 'mute8-react'
 import { CombinePlugins, LocalStoragePlugin, DevTools } from 'mute8-plugins'
-DevTools.enable()
 
 interface User {
   id: number,

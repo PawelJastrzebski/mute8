@@ -1,7 +1,8 @@
+import "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 import { Component, Injectable, inject } from '@angular/core';
-import { FormsModule, NgForm, NgModel } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { newStore } from 'mute8-angular';
-// import { DevTools } from 'mute8-plugins';
+import { DevTools } from 'mute8-plugins';
 
 @Injectable({ providedIn: "root" })
 export class CounterService {
@@ -16,7 +17,7 @@ export class CounterService {
         this.count2 = this.count2 + value;
       }
     },
-    // plugin: DevTools.register("counter") as any
+    plugin: DevTools.register("counter")
   })
 
   constructor() {

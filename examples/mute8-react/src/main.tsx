@@ -1,3 +1,4 @@
+import "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 import './index.css'
 import React, { ReactElement } from 'react'
 import ReactDOM from 'react-dom/client'
