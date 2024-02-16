@@ -26,9 +26,8 @@ const defaultPlugin: <T>() => Plugin<T> = () => ({
 class Subject<T> {
     private id: number = 0; // subscription id
     private c: Record<number, SubFn<T>> = {} // subscription container
-    private t: NodeJS.Timeout // sub triger
     private s: Readonly<T> // current state
-    private p: Plugin<T>
+    private p: Plugin<T> // plugin
     private ps: Sub | null // parent sub
 
     constructor(
@@ -67,15 +66,13 @@ class Subject<T> {
                 this.s = update as T
                 this.ns()
             }
-            return
-        }
-
-        const newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
-        if (toJson(this.s) !== toJson(newFinal)) {
-            clearTimeout(this.t);
-            this.p.AChange(this.s, newFinal)
-            this.s = freeze(newFinal)
-            this.t = setTimeout(this.ns.bind(this), 0);
+        } else {
+            const newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
+            if (toJson(this.s) !== toJson(newFinal)) {
+                this.p.AChange(this.s, newFinal)
+                this.s = freeze(newFinal)
+                this.ns()
+            }
         }
     }
 
@@ -95,23 +92,19 @@ interface Observer<T> {
 
 class StoreCore<T, A, AA> {
     readonly s: Subject<T>
-    readonly bp: StoreProxy<T, A, AA>; // big proxy
+    readonly p: StoreProxy<T, A, AA>; // proxy
 
     constructor(state: T, actions: A, aactions: AA, plugin?: PluginBuilder) {
         this.s = new Subject(state)
         const asyncProxy = buildActionProxy(aactions, (_, fn) => {
-            return async (...args: any[]) => await fn.bind(this.bp)(...args)
+            return async (...args: any[]) => await fn.bind(this.p)(...args)
         })
         const actionsProxy = buildActionProxy(actions, (_, fn) => {
-            return (...args: any[]) => {
-                const state = deepClone(this.s.sanp())
-                fn.bind(state)(...args)
-                this.s.next(state)
-            }
+            return (...args: any[]) => this.mut(v => fn.bind(v)(...args))
         })
-        // init big proxy
+        // init proxy
         const core = this;
-        this.bp = {
+        this.p = {
             snap: () => core.s.sanp(),
             sub: (v) => core.s.sub(v),
             select: (f) => core.s.select(f),
@@ -124,7 +117,7 @@ class StoreCore<T, A, AA> {
         }
 
         // init plugin
-        const p = plugin?.(this.bp) ?? defaultPlugin()
+        const p = plugin?.(this.p) ?? defaultPlugin()
         this.s = new Subject(state, p)
     }
 
@@ -135,13 +128,12 @@ class StoreCore<T, A, AA> {
     }
 
     /** updateValue() */
-    update(key: any, value: any): boolean {
+    update(key: any, value: any): void {
         if (key === "mut") {
             this.s.next(value)
         } else {
             this.s.next({ [key]: value } as Partial<T>)
         }
-        return true
     }
 }
 
@@ -179,19 +171,19 @@ export const buildProxy = <T extends object, A, AA>(state: StoreDefiniton<T, A, 
         state.plugin
     )
     const extension = !ext ? {} : { [ext.name]: ext.init(core as StoreCore<any, any, any>) } as {}
-    const bigProxy = assign(extension, core.bp)
+    const bigProxy = assign(extension, core.p)
 
     // build store representation (proxy)
     const store = {}
     for (const [key, _] of entries(state.value)) {
         defineProperty(store, key, {
             get() { return core.s.sanp()[key] },
-            set(v) { return core.update(key, v) }
+            set(v) { core.update(key, v) }
         })
     }
     defineProperty(store, "mut", {
         get() { return core.mut.bind(core) },
-        set(v: any) { core.s.next(v) }
+        set(v) { core.s.next(v) }
     })
     return freeze(assign(store, bigProxy)) as Store<T, A, AA>
 }

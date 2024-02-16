@@ -9,7 +9,7 @@
     "test": "npx jest",
     "lint": "tsc --watch",
     "test:watch": "npx jest --watchAll --maxWorkers=8",
-    "build": "npm run build:mute8 && concurrently -n plugins,react,solid,devtools 'npm run build:plugins' 'npm run build:react' 'npm run build:solid'  'npm run devtools' ",
+    "build": "npm run build:mute8 && concurrently -n plugins,react,solid,angular,devtools 'npm run build:plugins' 'npm run build:react'  'npm run build:angular' 'npm run build:solid'  'npm run devtools' ",
     "build:mute8": "cd ./packages/mute8 && npx tsup",
     "build:react": "cd ./packages/mute8-react && npx tsup",
     "build:plugins": "cd ./packages/mute8-plugins && npx tsup",

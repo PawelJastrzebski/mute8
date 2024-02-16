@@ -72,8 +72,6 @@ describe("Unit mute8", () => {
             name: "Amy"
         }
 
-        // event is fired lazy
-        await wait(10);
         expect(subFired).toEqual(1)
         sub.destroy();
     });
@@ -88,12 +86,10 @@ describe("Unit mute8", () => {
         let subFired = 0;
         const sub = state.sub((v) => subFired++);
 
-        // two updates only once sub() event fired
         state.cars = [...state.cars, "Tesla"]
         state.cars = [...state.cars, "BMW"]
 
-        await wait(1);
-        expect(subFired).toEqual(1)
+        expect(subFired).toEqual(2)
         expect(state.cars).toEqual(["Tesla", "BMW"])
         sub.destroy();
     });
@@ -110,17 +106,14 @@ describe("Unit mute8", () => {
         const sub2 = store.sub((v) => subFired++);
 
         store.update = 1
-        await wait(1);
         expect(subFired).toEqual(2)
         sub1.destroy();
 
         store.update = 2
-        await wait(1);
         expect(subFired).toEqual(3)
         sub2.destroy();
 
         store.update = 3
-        await wait(1);
         expect(subFired).toEqual(3)
     });
 
@@ -138,7 +131,6 @@ describe("Unit mute8", () => {
         store.mut = {
             name: "Amy"
         }
-        await wait(1);
         expect(subFired).toEqual(0)
 
     });
@@ -208,7 +200,6 @@ describe("Unit mute8", () => {
         expect(state.counter).toEqual(2)
     });
 
-
     test('Selector', async () => {
         const state = newStore({
             value: {
@@ -223,7 +214,6 @@ describe("Unit mute8", () => {
         expect(c2.sanp().ok).toEqual(1)
         // update parent
         state.counter = 2;
-        await wait(10)
         //assert
         expect(c1.sanp()).toEqual(2)
         expect(c2.sanp().ok).toEqual(2)
