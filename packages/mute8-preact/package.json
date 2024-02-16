@@ -1,0 +1,27 @@
+{
+    "name": "mute8-preact",
+    "description": "Preact State Container",
+    "version": "0.0.0-alpha.0",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8-preact.cjs",
+    "module": "dist/mute8-preact.js",
+    "types": "dist/mute8-preact.d.ts",
+    "scripts": {},
+    "keywords": [
+        "Preact",
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable"
+    ],
+    "peerDependencies": {
+        "preact": "^10.19.3"
+    }
+}
