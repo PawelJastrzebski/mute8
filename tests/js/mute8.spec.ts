@@ -168,6 +168,42 @@ describe("Unit mute8", () => {
         expect(c2.sanp().ok).toEqual(2)
     });
 
+    test('Selector array', async () => {
+        const state = newStore({
+            value: { 
+                names: ["ok"]
+             },
+             actions: {
+                addName(name: string) {
+                    this.names.push(name)
+                }
+             }
+        })
+
+        const names = state.select((v) => v.names)
+        expect(names.sanp()).toEqual(["ok"])
+
+        let names_emited = [] as string[];
+        names.sub(v => names_emited = [...v])
+
+        expect(names_emited).toEqual([])
+        state.names = ["direct"]
+        expect(names_emited).toEqual(["direct"])
+        state.mut = {names: ["mut"]}
+        expect(names_emited).toEqual(["mut"])
+
+        state.actions.addName("add")
+        expect(names_emited).toEqual(["mut", "add"])
+        expect(names.sanp()).toEqual(["mut", "add"])
+        expect(state.names).toEqual(["mut", "add"])
+        expect(state.snap().names).toEqual(["mut", "add"])
+
+        state.names = []
+        expect(names_emited).toEqual([])
+        expect(names.sanp()).toEqual([])
+        expect(state.names).toEqual([])
+        expect(state.snap().names).toEqual([])
+    });
 })
 
 test('Example car store', async () => {

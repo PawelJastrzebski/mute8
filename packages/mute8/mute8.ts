@@ -28,19 +28,14 @@ class Subject<T> {
     private c: Record<number, SubFn<T>> = {} // subscription container
     private s: Readonly<T> // current state
     private p: Plugin<T> // plugin
-    private ps: Sub | null // parent sub
+    private ps: Sub | null // parent sub (Observer only)
 
     constructor(
         state: T,
-        plugin?: Plugin<T>
+        plugin?: Plugin<T> // plugins not allowed for Observer
     ) {
         this.p = plugin ?? defaultPlugin()
         this.s = freeze(this.p.BInit(state))
-    }
-
-    /** notifySubs() */
-    private ns(): void {
-        O.keys(this.c).forEach(id => this.c[id](this.s))
     }
 
     destroy() {
@@ -61,25 +56,24 @@ class Subject<T> {
     }
 
     next(update: Partial<T>): void {
-        if (!isObject(this.s)) {
-            if (this.s !== update) {
-                this.s = update as T
-                this.ns()
-            }
-        } else {
-            const newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
-            if (toJson(this.s) !== toJson(newFinal)) {
-                this.p.AChange(this.s, newFinal)
-                this.s = freeze(newFinal)
-                this.ns()
-            }
+        // for Observer always full update
+        let newFinal: T = update as T;
+        if (!this.ps) {
+            newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
+        }
+
+        if (toJson(this.s) !== toJson(newFinal)) {
+            this.p.AChange(this.s, newFinal)
+            this.s = freeze(newFinal)
+            // notify subscribers
+            O.keys(this.c).forEach(id => this.c[id](this.s))
         }
     }
 
     select<O>(fn: SelectFn<T, O>): Observer<O> {
-        const subject = new Subject(fn(this.sanp()))
-        subject.ps = this.sub((v) => subject.next(fn(v)))
-        return subject;
+        const observer = new Subject(fn(this.sanp()))
+        observer.ps = this.sub((v) => observer.next(fn(v)))
+        return observer;
     }
 }
 

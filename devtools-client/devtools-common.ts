@@ -4,7 +4,7 @@ import { PluginBuilder } from "../packages/mute8/dist/mute8";
 export const SCRIPT_URL = "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 export const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
-// export const SCRIPT_URL = "http://localhost:4040/devtools-v1.mjs"
+// export const SCRIPT_URL = "http://localhost:4040/v1.mjs"
 // export const UI_URL = "http://localhost:4030"
 
 // consts

@@ -67,7 +67,8 @@ const stateInfo = (state: FetchState) => {
 
 function Async() {
   const [state,] = store.react.useOne('state')
-  const rows = store.snap().users.map(u => {
+  const users = store.react.select(v => v.users)
+  const rows = users.map(u => {
     return (
       <tr key={u.id} >
         <th scope="row">{u.id}</th>
