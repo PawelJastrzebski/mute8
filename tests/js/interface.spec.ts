@@ -7,7 +7,7 @@ test('Test exported JS mehods', () => {
     expect(mute8.newStore).toBeTruthy()
 
     // only mute8
-    expect(mute8.newStoreProxy).toBeTruthy()
+    expect(mute8.buildProxy).toBeTruthy()
 });
 
 // Test exported types/interfaces

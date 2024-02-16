@@ -1,17 +1,7 @@
-import axios from "axios"
-import { failed } from "./utils"
+
+import { testUrl } from "./utils"
 import * as fs from "fs/promises"
 
-const testUrl = async (url: string) => {
-    try {
-        const res = await axios.get(url)
-        expect(res.status).toBeCloseTo(200)
-        expect(res.data).toBeTruthy()
-    } catch (e) {
-        failed(`Url: ${url}\nError: ${e}`)
-    }
-
-}
 
 const HOMEPAGE_URL = "https://paweljastrzebski.github.io/mute8"
 const DEVTOOLS_UI_URL = "https://paweljastrzebski.github.io/mute8-devtools"
@@ -34,6 +24,15 @@ describe("Validate project files & configuration", () => {
 
         expect(fileContent).toContain(DEVTOOLS_UI_URL)
         expect(fileContent).toContain("MUTE-8-DEVTOOLS")
+    })
+
+    test('Test packages/mute8', async () => {
+        const file = await fs.readFile("packages/mute8/dist/mute8.js");
+        const fileContent = file.toString()
+
+        // exports
+        expect(fileContent).toContain("newStore")
+        expect(fileContent).toContain("buildProxy")
     })
 
     test('Test packages/mute8-plugins', async () => {

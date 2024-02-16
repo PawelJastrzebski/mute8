@@ -1,4 +1,4 @@
-import { Store as StoreMute8, StoreDefiniton, ProxyExtension, newStoreProxy, SelectFn } from "../mute8/mute8"
+import { Store as StoreMute8, StoreDefiniton, ProxyExtension, buildProxy, SelectFn } from "../mute8/mute8"
 import { signal, effect, Signal } from '@angular/core';
 
 interface AngularExtension<T> {
@@ -46,7 +46,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
         },
     }
 
-    return newStoreProxy(store as any, extension) as Store<T, A, AA>
+    return buildProxy(store, extension) as Store<T, A, AA>
 }
 
 export { SubFn, VoidFn, AsyncFn, Sub, Plugin } from "../mute8/mute8"

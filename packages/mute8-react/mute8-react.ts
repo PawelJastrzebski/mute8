@@ -1,5 +1,4 @@
-import * as mute8 from "../mute8/mute8"
-import { Store as StoreMute8, StoreDefiniton, ProxyExtension, SelectFn } from "../mute8/mute8"
+import { Store as StoreMute8, StoreDefiniton, ProxyExtension, SelectFn, buildProxy } from "../mute8/mute8"
 import { useState, useEffect } from 'react';
 
 interface ReactExtension<T> {
@@ -47,7 +46,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
         },
     }
 
-    return mute8.newStoreProxy(store as any, extension) as Store<T, A, AA>
+    return buildProxy(store, extension) as Store<T, A, AA>
 }
 
 export { SubFn, VoidFn, AsyncFn, Sub, Plugin } from "../mute8/mute8"

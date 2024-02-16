@@ -1,9 +1,11 @@
-import { Plugin, PluginBuilder, StoreProxy, defaultPlugin } from "../mute8/mute8"
+import { Plugin, PluginBuilder, StoreProxy } from "../mute8/mute8"
 
 // CombinePlugins Util
-export const CombinePlugins = (...plugins: PluginBuilder[]) => {
+export const CombinePlugins = (...plugins: PluginBuilder[]): PluginBuilder => {
     return <T>(proxy: StoreProxy<T, any, any>): Plugin<T> => {
-        const initializedPlugins = plugins.map(p => p(proxy as any)) as Plugin<T>[]
+        const initializedPlugins = plugins
+            .map(p => p?.(proxy))
+            .filter(p => !!p) as Plugin<T>[]
 
         return {
             BInit: (initState) => {
@@ -76,6 +78,6 @@ export const DevTools: DevToolsInterface = window[DEVTOOLS_KEY] ?? {
         }
     },
     disable() { disableDevTools() },
-    register() { return defaultPlugin },
+    register() { return null as PluginBuilder },
     openDevTools() { },
 } as DevToolsInterface;
