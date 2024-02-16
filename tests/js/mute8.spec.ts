@@ -1,32 +1,11 @@
-import { newStore, Plugin } from "../../packages/mute8"
+import { newStore } from "../../packages/mute8"
 import { wait } from "./utils"
 
 describe("Unit mute8", () => {
 
-    test('test performance', () => {
-        const name = "expected: 600ms >";
-        const store = newStore({
-            value: {
-                name: "ok"
-            }
-        })
-
-        console.time(name)
-        for (let index = 0; index < 1000_000_000; index++) {
-            const x = store.name;
-        }
-        console.timeEnd(name)
-
-        expect(store).toBeTruthy()
-        expect(store.name).toEqual("ok")
-    });
-
-
     test('Init state', () => {
         const store = newStore({
-            value: {
-                name: "ok"
-            }
+            value: { name: "ok" }
         })
 
         expect(store).toBeTruthy()
@@ -35,9 +14,7 @@ describe("Unit mute8", () => {
 
     test('Get state snapshot', () => {
         const store = newStore({
-            value: {
-                name: "Tom"
-            }
+            value: { name: "Tom" }
         })
 
         expect(store.snap()).toEqual({ name: "Tom" })
@@ -46,9 +23,7 @@ describe("Unit mute8", () => {
 
     test('Subscribe', () => {
         const store = newStore({
-            value: {
-                name: "Sub"
-            }
+            value: { name: "Sub" }
         })
 
         const sub = store.sub((v) => console.log(v));
@@ -58,9 +33,7 @@ describe("Unit mute8", () => {
 
     test('Subscribe lazy 1', async () => {
         const store = newStore({
-            value: {
-                name: "Sub"
-            }
+            value: { name: "Sub" }
         })
 
         let subFired = 0;
@@ -68,9 +41,7 @@ describe("Unit mute8", () => {
             subFired++;
             expect(v.name).toEqual("Amy")
         });
-        store.mut = {
-            name: "Amy"
-        }
+        store.mut = { name: "Amy" }
 
         expect(subFired).toEqual(1)
         sub.destroy();
@@ -78,9 +49,7 @@ describe("Unit mute8", () => {
 
     test('Subscribe lazy 2', async () => {
         let state = newStore({
-            value: {
-                cars: [] as string[]
-            }
+            value: { cars: [] as string[] }
         });
 
         let subFired = 0;
@@ -96,9 +65,7 @@ describe("Unit mute8", () => {
 
     test('Subscribe multi', async () => {
         let store = newStore({
-            value: {
-                update: 0
-            }
+            value: { update: 0 }
         });
 
         let subFired = 0;
@@ -119,41 +86,31 @@ describe("Unit mute8", () => {
 
     test('Subscribe/Unsubscribe ', async () => {
         const store = newStore({
-            value: {
-                name: "Sub"
-            }
+            value: { name: "Sub" }
         })
 
         let subFired = 0;
         const sub = store.sub((v) => subFired++);
         sub.destroy();
 
-        store.mut = {
-            name: "Amy"
-        }
+        store.mut = { name: "Amy" }
         expect(subFired).toEqual(0)
 
     });
 
     test('Mutate by setter mut', () => {
         const store = newStore({
-            value: {
-                name: "Tom"
-            }
+            value: { name: "Tom" }
         })
 
         expect(store.name).toEqual("Tom")
-        store.mut = {
-            name: "Amy"
-        }
+        store.mut = { name: "Amy" }
         expect(store.name).toEqual("Amy")
     });
 
     test('Mutate by mut()', () => {
         const state = newStore({
-            value: {
-                name: "Tom"
-            }
+            value: { name: "Tom" }
         })
 
         expect(state.name).toEqual("Tom")
@@ -163,9 +120,7 @@ describe("Unit mute8", () => {
 
     test('Mutate by prop', () => {
         const state = newStore({
-            value: {
-                name: "Tom"
-            }
+            value: { name: "Tom" }
         })
 
         expect(state.name).toEqual("Tom")
@@ -175,9 +130,7 @@ describe("Unit mute8", () => {
 
     test('Define action', async () => {
         const state = newStore({
-            value: {
-                name: "Sub"
-            },
+            value: { name: "Sub" },
             actions: {
                 setName(name: string) {
                     this.name = name;
@@ -190,9 +143,7 @@ describe("Unit mute8", () => {
 
     test('Functional action', async () => {
         const state = newStore({
-            value: {
-                counter: 1
-            }
+            value: { counter: 1 }
         })
         const incrementCounter = () => state.mut(s => s.counter++)
 
@@ -202,9 +153,7 @@ describe("Unit mute8", () => {
 
     test('Selector', async () => {
         const state = newStore({
-            value: {
-                counter: 1
-            }
+            value: { counter: 1 }
         })
 
         // select
@@ -230,9 +179,7 @@ test('Example car store', async () => {
     }
 
     const store = newStore({
-        value: {
-            cars: [] as Car[]
-        },
+        value: { cars: [] as Car[] },
         actions: {
             addCar(car: Car) {
                 this.cars.push(car)

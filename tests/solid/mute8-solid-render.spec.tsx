@@ -1,4 +1,5 @@
-import {render, renderWait} from "./utils"
+import axios from "axios"
+import { render, renderWait } from "./utils"
 import { newStore } from "../../packages/mute8-solid"
 
 describe("Solid rendering", () => {
@@ -44,6 +45,50 @@ describe("Solid rendering", () => {
         store.mut(v => v.name = "Hello")
         await renderWait()
         expect(getText()).toEqual("Hello")
+    });
+
+    test('Async action', async () => {
+        type FetchState = "init" | "pending" | "ready" | "error"
+        const store = newStore({
+            value: {
+                state: "init" as FetchState,
+                users: []
+            },
+            actions: {
+                setUsers(data: any[]) {
+                    this.users = data
+                },
+                setFetchState(state: FetchState) {
+                    this.state = state
+                }
+            },
+            async: {
+                async fetchUsers() {
+                    this.actions.setFetchState("pending")
+                    const res = await axios.get("https://reqres.in/api/users")
+                    this.actions.setUsers(res.data["data"])
+                    this.actions.setFetchState("ready")
+                }
+            }
+        })
+
+        function TestCounter() {
+            const [s,] = store.solid.use()
+            return (<div id="state">{s().state}</div>)
+        }
+
+        // render
+        const root = await render(<TestCounter />)
+        const getDiv = () => root.querySelector("#state") as HTMLDivElement
+        expect(getDiv().innerHTML).toEqual("init")
+
+        const promise = store.async.fetchUsers();
+        await renderWait()
+        expect(getDiv().innerHTML).toEqual("pending")
+        await promise
+        await renderWait()
+        expect(getDiv().innerHTML).toEqual("ready")
+        expect(store.snap().users.length > 0).toBeTruthy()
     });
 
 })

@@ -13,3 +13,14 @@ export const testUrl = async (url: string) => {
     }
 }
 
+export const timed = (label: string, timeoutMs: number,  fn: () => any)  => {
+    const s = performance.now();
+    fn()
+    const e = performance.now();
+    const took = e - s;
+    console.log(`${label} took ${took.toFixed(3)}ms`);
+
+    if(took > timeoutMs) {
+        failed(`${label}: max=${timeoutMs}ms took=${took.toFixed(3)}ms`)
+    }
+}
