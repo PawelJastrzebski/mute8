@@ -9,13 +9,14 @@
     "test": "npx jest",
     "lint": "tsc --watch",
     "test:watch": "npx jest --watchAll --maxWorkers=8",
-    "build": "npm run build:mute8 && concurrently -n plugins,react,solid,angular,preact,devtools 'npm run build:plugins' 'npm run build:react'  'npm run build:angular' 'npm run build:solid' 'npm run build:preact'  'npm run devtools' ",
+    "build": "npm run build:mute8 && concurrently -n plugins,react,solid,angular,preact,vue,devtools 'npm run build:plugins' 'npm run build:react'  'npm run build:angular' 'npm run build:solid' 'npm run build:preact' 'npm run build:vue' 'npm run devtools' ",
     "build:mute8": "cd ./packages/mute8 && npx tsup",
     "build:react": "cd ./packages/mute8-react && npx tsup",
     "build:plugins": "cd ./packages/mute8-plugins && npx tsup",
     "build:solid": "cd ./packages/mute8-solid && npx tsup",
     "build:angular": "cd ./packages/mute8-angular && npx tsup",
     "build:preact": "cd ./packages/mute8-preact && npx tsup",
+    "build:vue": "cd ./packages/mute8-vue && npx tsup",
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "cd ./packages && npm publish ./mute8 && npm publish ./mute8-react && npm publish ./mute8-plugins",
     "publish:npm:test": "cd ./packages && npm publish ./mute8 --dry-run && npm publish ./mute8-react --dry-run && npm publish ./mute8-plugins --dry-run",
@@ -32,7 +33,8 @@
     "react-dom": "^18.2.0",
     "solid-js": "^1.8.14",
     "@angular/core": "^17.1.0",
-    "preact": "^10.19.3"
+    "preact": "^10.19.3",
+    "vue": "^3.4.15"
   },
   "devDependencies": {
     "@babel/core": "^7.23.9",

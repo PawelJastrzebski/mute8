@@ -1,0 +1,22 @@
+{
+  "name": "mute8-vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "mute8-plugins": "file:../../packages/mute8-plugins",
+    "mute8-vue": "file:mute8-vue",
+    "vue": "^3.4.15"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0",
+    "vue-tsc": "^1.8.27"
+  }
+}

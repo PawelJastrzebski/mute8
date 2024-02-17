@@ -1,0 +1,27 @@
+{
+    "name": "mute8-vue",
+    "description": "Solid State Container",
+    "version": "0.0.0-alpha.0",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8-vue.cjs",
+    "module": "dist/mute8-vue.js",
+    "types": "dist/mute8-vue.d.ts",
+    "scripts": {},
+    "keywords": [
+        "Vue",
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable"
+    ],
+    "peerDependencies": {
+        "vue": "^3.4.15"
+    }
+}
