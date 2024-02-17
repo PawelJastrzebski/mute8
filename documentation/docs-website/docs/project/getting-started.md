@@ -5,24 +5,22 @@ sidebar_position: 3
 # Getting Started
 
 ### Under construction 🚧
-Project is in early stage of development
+Project is in early stage of development.
 
 ### Why?
 Inspired by Recoil and Redux.
 Striving to offer a lightweight state management solution for applications that don't need the full capabilities of Redux.
 
-## Instalation
-**JavaScript**
-```sh
-npm i mute8
-```
-**React**
+
+
+## Example
+Here's an example of React version. For full examples in different frameworks, please go to the [examples](https://github.com/PawelJastrzebski/mute8/tree/main/examples) directory.
+
+#### Install
+
 ```sh
 npm i mute8-react
 ```
-
-## Examples
-For full examples go to `examples` directory
 
 #### Import
 ```ts

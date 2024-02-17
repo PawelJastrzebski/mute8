@@ -18,20 +18,21 @@ const store = newStore({
 setInterval(() => {
   store.count = store.count + 100;
   store.count = store.count + 100;
-}, 100)
+}, 50)
 
 setInterval(() => {
   store.count = store.count + 1;
   store.count = Math.floor(store.count * 2)
 
   store.count2 = store.count2 + 1000;
-}, 100)
+}, 50)
 
 // state.sub((v) => console.log(v.count))
 
 function Couter() {
   const [, setFull] = store.react.use();
-  const [count,] = store.react.useOne('count')
+  const countSelect = store.react.select(v => `store.react.select() ${v.count2.toFixed(2)}`);
+  const [count, ] = store.react.useOne("count")
   const [count2, setCount2] = store.react.useOne("count2")
   const [name, setName] = store.react.useOne("appName")
 
@@ -40,6 +41,7 @@ function Couter() {
       <h1>{name.length > 0 ? name : "Empty Name"}</h1>
       <div style={{ padding: "20px 0" }} className="card">
         <h4>count is {count}</h4>
+        <h4>{countSelect}</h4>
         <button onClick={() => setCount2(count2 + 1)}>
           count2 react hook {count2}
         </button>

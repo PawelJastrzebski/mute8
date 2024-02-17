@@ -1,3 +1,5 @@
+import "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
+import { CombinePlugins, DevTools, LocalStoragePlugin } from 'mute8-plugins'
 import { newStore } from 'mute8-solid'
 import { createMemo } from 'solid-js'
 
@@ -47,7 +49,8 @@ const store = newStore({
         this.actions.setFetchState("error")
       }
     }
-  }
+  },
+  plugin: CombinePlugins(LocalStoragePlugin.new("async-users"), DevTools.register("async-users"))
 })
 
 const stateInfo = (state: FetchState) => {

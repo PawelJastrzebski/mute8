@@ -1,0 +1,14 @@
+<h1>{{name().length > 0 ? name() : "Empty Name"}}</h1>
+<div class="card">
+  <h4>count is {{count()}}</h4>
+  <h4>{{countSelect()}}</h4>
+  <button (click)="store.count2 = count2() + 1"> count2 direct {{count2()}} </button>
+  <button (click)="store.actions.incrementCounter2(1)"> count2 mute8 action {{count2()}} </button>
+  <br />
+  <br />
+  <div>
+    <input [ngModel]="name()" (keyup)="updateDirect($event)" type='text'>
+  </div>
+  <br /><br />
+  <button (click)="this.store.mut = {count: 0, count2: 0}"> Reset Couters </button>
+</div>

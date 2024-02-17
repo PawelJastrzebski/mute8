@@ -119,7 +119,5 @@ To keep packages lightweight, we do not provide type validation at runtime.
 # DevTools
 Visit [documentation](https://paweljastrzebski.github.io/mute8) for more details
 
-<img src="documentation/mute8-devtools.png" alt="mute8-devtools" width="600"/>
-
 ## Authors
 - Paweł Jastrzębski 🇵🇱

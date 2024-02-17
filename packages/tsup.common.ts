@@ -1,7 +1,7 @@
 
 import { Options } from "tsup"
 
-const tsConfigPath = `${__dirname}/../tsconfig.json`;
+const tsConfigPath = `${__dirname}/tsconfig.json`;
 
 export const commonOptions: Options = {
     splitting: false,

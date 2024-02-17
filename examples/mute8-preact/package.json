@@ -1,0 +1,21 @@
+{
+  "name": "mute8-preact-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "mute8-plugins": "^0.0.0-alpha.3",
+    "mute8-preact": "^0.0.0-alpha.0",
+    "preact": "^10.19.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.8.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0"
+  }
+}

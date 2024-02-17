@@ -105,7 +105,7 @@ html[data-theme='dark'] .header-github-link:before {
   padding: 5px;
 }
 
-#logo > div {
+#logo>div {
   box-sizing: border-box;
   width: 100%;
   height: 200px;
@@ -114,21 +114,23 @@ html[data-theme='dark'] .header-github-link:before {
   margin: 0 auto;
   outline: 4px solid var(--color);
   transition: 300ms;
+  display: flex;
 }
 
-[data-theme='dark'] #logo > div {
+[data-theme='dark'] #logo>div {
   background-color: rgb(38 38 38)
 }
 
-#logo > div .img {
-  width: 200px;
-  height: 200px;
+#logo>div .img {
+  width: 160px;
+  height: 160px;
   margin: auto;
   background: url("/img/logo-light.svg") center no-repeat;
   background-size: contain;
 }
-[data-theme='dark'] #logo > div > .img {
-  background: url("/img/logo-dark.svg") center no-repeat ;
+
+[data-theme='dark'] #logo>div>.img {
+  background: url("/img/logo-dark.svg") center no-repeat;
   background-size: contain;
 }
 
@@ -148,11 +150,10 @@ html[data-theme='dark'] .header-github-link:before {
 
 #hero-section {
   display: flex;
-  margin-bottom: 40px;
 }
 
 #hero-section .logo-section {
-  flex: 8;
+  flex: 20;
   display: flex;
   justify-content: right;
 }
@@ -161,13 +162,14 @@ html[data-theme='dark'] .header-github-link:before {
   background: url("/img/home/css-screen.svg") center no-repeat;
   background-size: cover;
   height: 300px;
-  width: 60%;
+  width: 50%;
+  width: 50%;
   min-width: 350px;
   margin: 20px;
 }
 
 #hero-section .text-section {
-  flex: 10;
+  flex: 18;
   display: flex;
   justify-content: flex-start;
 }
@@ -191,6 +193,38 @@ html[data-theme='dark'] .header-github-link:before {
   padding-bottom: 20px;
 }
 
+#frameworks-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+#frameworks-section h2 {
+  font-size: 2rem;
+}
+
+#frameworks-section .items {
+  padding: 35px;
+  display: flex;
+  gap: 28px;
+  filter: contrast(1.1) opacity(0.8);
+  transition: 300ms ease-in-out;
+}
+
+#frameworks-section .items:hover {
+  filter: contrast(1.1) opacity(0.9);
+}
+
+#frameworks-section .items img {
+  cursor: pointer;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  display: block;
+}
 
 .anchor:hover .hash-link {
   opacity: .8 !important;
@@ -198,4 +232,8 @@ html[data-theme='dark'] .header-github-link:before {
 
 div:has(> a.short-dropdown) {
   padding: 4px 20px 4px 0;
+}
+
+.language-sh .token.plain {
+  color: rgba(210, 0, 56, 0.788);
 }

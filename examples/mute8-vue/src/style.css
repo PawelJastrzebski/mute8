@@ -1,0 +1,156 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: rgb(31, 31, 31);
+
+  --color: #FF004C;
+  --border-radious: 15px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  font-weight: 500;
+  color: var(--color);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--color)
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  margin: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #e2e2e2;
+  color: black;
+  cursor: pointer;
+  transition: 200ms;
+}
+button:hover {
+  color: var(--color);
+}
+
+input {
+  padding: 10px;
+  margin: 10px;
+  border-radius: var(--border-radious);
+  font-family: inherit;
+  font-size: .9em;
+  font-weight: 500;
+  border: none;
+  color: black;
+  background-color: white;
+  outline: none;
+  border: 3px solid transparent;
+}
+
+input:hover, input:focus {
+  border-color: var(--color)
+}
+
+li {
+  padding: 5px;
+  text-align: left;
+}
+
+/* App */
+
+#root {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+#nav {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+#nav button {
+  padding: 12px 20px;
+  min-width: 100px;
+  margin: 5px;
+  cursor: pointer;
+  background-color: rgb(255, 255, 255);
+  border: 3px solid transparent;
+}
+
+#nav button.active {
+  border-color: var(--color);
+}
+
+#logo {
+  width: 100%;
+  padding: 10px;
+}
+
+#logo div {
+  width: 100%;
+  height: 250px;
+  background: url("https://raw.githubusercontent.com/PawelJastrzebski/mute8/main/doc/mut8.svg") center no-repeat;
+  background-size: contain;
+  background-color: white;
+  border-radius: var(--border-radious);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+#router {
+  flex: 1;
+  text-align: center;
+  padding: 20px;
+  overflow: auto;
+}
+
+.card {
+  margin: 0 auto;
+  max-width: 1200px;
+  background-color: #292929;
+  border-radius: var(--border-radious);
+  padding: 20px 10px;
+}
+
+/* Async Example */
+
+table {
+  border: none;
+  width: 100%;
+  border-collapse: collapse;
+  border: none;
+  border-radius: 10px;
+  font-size: .95rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+table th {
+  height: 60px;
+}

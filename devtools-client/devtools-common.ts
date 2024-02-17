@@ -4,16 +4,14 @@ import { PluginBuilder } from "../packages/mute8/dist/mute8";
 export const SCRIPT_URL = "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 export const UI_URL = "https://paweljastrzebski.github.io/mute8-devtools/"
 
-// export const SCRIPT_URL = "http://localhost:4040/devtools-v1.mjs"
+// export const SCRIPT_URL = "http://localhost:4040/v1.mjs"
 // export const UI_URL = "http://localhost:4030"
 
 // consts
 export const DEVTOOLS_KEY = "MUTE-8-DEVTOOLS"
 export type DevToolsStatus = "enabled" | "open" | "closed";
-export const disableDevTools = () => localStorage.removeItem(DEVTOOLS_KEY)
 export const setDevToolsStatus = (status: DevToolsStatus) => localStorage.setItem(DEVTOOLS_KEY, status)
 export const getDevToolsStatus = () => localStorage.getItem(DEVTOOLS_KEY) as DevToolsStatus
-export const DevToolsEnabled = () => !!localStorage.getItem(DEVTOOLS_KEY) as boolean
 
 export type DevToolsOptions = {
     logger: {
@@ -24,8 +22,7 @@ export type DevToolsOptions = {
 }
 
 export interface DevToolsInterface {
-    enable: () => void
-    disable: () => void
+    import: () => Promise<void>
     openDevTools: (globalOptions?: DevToolsOptions) => void;
     register: (label: string, options?: DevToolsOptions) => PluginBuilder
 }
