@@ -1,5 +1,5 @@
 {
-  "name": "mute8-vue",
+  "name": "mute8-vue-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mute8-plugins": "file:../../packages/mute8-plugins",
-    "mute8-vue": "file:mute8-vue",
+    "mute8-plugins": "^0.0.0-alpha.3",
+    "mute8-vue": "^0.0.0-alpha.0",
     "vue": "^3.4.15"
   },
   "devDependencies": {

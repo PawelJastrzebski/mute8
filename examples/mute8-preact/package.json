@@ -1,5 +1,5 @@
 {
-  "name": "mute8-preact",
+  "name": "mute8-preact-example",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "mute8-plugins": "file:../../packages/mute8-plugins",
-    "mute8-preact": "file:mute8-preact",
+    "mute8-plugins": "^0.0.0-alpha.3",
+    "mute8-preact": "^0.0.0-alpha.0",
     "preact": "^10.19.3"
   },
   "devDependencies": {

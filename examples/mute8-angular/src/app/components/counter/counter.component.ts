@@ -1,4 +1,3 @@
-import "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
 import { Component, Injectable, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { newStore } from 'mute8-angular';

@@ -2,7 +2,6 @@
     "name": "mute8-angular",
     "description": "Angular State Container",
     "version": "0.0.0-alpha.0",
-    "private": true,
     "type": "module",
     "author": "Paweł Jastrzębski",
     "license": "MIT",

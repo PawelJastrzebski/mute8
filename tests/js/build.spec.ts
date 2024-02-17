@@ -2,7 +2,6 @@
 import { testUrl } from "./utils"
 import * as fs from "fs/promises"
 
-
 const HOMEPAGE_URL = "https://paweljastrzebski.github.io/mute8"
 const DEVTOOLS_UI_URL = "https://paweljastrzebski.github.io/mute8-devtools"
 const DEVTOOLS_SCRIPT_URL = "https://paweljastrzebski.github.io/mute8/devtools/v1.mjs"
@@ -46,6 +45,12 @@ describe("Validate project files & configuration", () => {
         expect(fileContent).toContain("DevTools")
         expect(fileContent).toContain("CombinePlugins")
         expect(fileContent).toContain("LocalStoragePlugin")
+
+        const dtsFile = await fs.readFile("packages/mute8-plugins/dist/mute8-plugins.d.ts");
+        const dts = dtsFile.toString()
+        // types
+        expect(dts).toContain("DevToolsPrivateTypes")
+        expect(dts).toContain("declare const DEV_TOOLS_SCRIPT_URL")
     })
 
 })

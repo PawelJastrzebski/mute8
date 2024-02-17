@@ -62,7 +62,7 @@ export const LocalStoragePlugin = {
 
 // DevTool
 import { DevToolsInterface, SCRIPT_URL, DEVTOOLS_KEY } from "../../devtools-client/devtools-common"
-
+export { DevToolsPrivateTypes } from "../../devtools-client/devtools-common"
 /** 
 * DevTools ThinClient
 *
