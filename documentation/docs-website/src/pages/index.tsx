@@ -13,6 +13,27 @@ function Logo() {
   )
 }
 
+const frameworks = [
+  { url: "https://angular.io/assets/images/logos/angular/angular.svg", alt: "angular", color: "DD0031" },
+  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/preact.svg", alt: "preact", color: "762CFB" },
+  { url: "https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg", alt: "vue", color: "41B883" },
+  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/react.svg", alt: "react", color: "61DAFB" },
+  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/solidjs-icon.svg", alt: "solidjs", color: "3864A5" },
+]
+
+function FrameworksSection() {
+  const items = frameworks.map(logo => {
+    return (
+      <img style={{ filter: `drop-shadow(2px 2px 0.7rem #${logo.color})` }} width="90px" src={logo.url} key={logo.alt} alt={logo.alt} />
+    )
+  })
+
+  return <div id='frameworks-section'>
+    <h2>Versatile</h2>
+    <div className="items">{items}</div>
+  </div>
+}
+
 function HeroSection() {
   const location = useLocation();
   return (
@@ -41,14 +62,10 @@ export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      noFooter={false}
-      title={`Hello from ${siteConfig.title}`}
-      description="Description will go into a meta tag in <head />">
+      noFooter={false}>
       <Logo />
       <HeroSection />
-      <main>
-        {/* <HomepageFeatures /> */}
-      </main>
+      <FrameworksSection />
     </Layout>
   );
 }
