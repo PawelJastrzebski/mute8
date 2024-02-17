@@ -55,8 +55,8 @@ const myCodeTheme: PrismTheme = {
       style: {
         color: "rgb(206, 145, 120)",
       },
-    },  
-     {
+    },
+    {
       types: ["string"],
       style: {
         color: "rgb(157, 205, 124)",
@@ -122,6 +122,31 @@ const myCodeThemeLight = JSON.parse(JSON.stringify(myCodeTheme))
 myCodeThemeLight.plain.background = "#333333"
 
 const repoUrl = "https://github.com/PawelJastrzebski/mute8"
+const packageNames = [
+  "mute8",
+  "mute8-angular",
+  "mute8-preact",
+  "mute8-vue",
+  "mute8-react",
+  "mute8-solid",
+  "mute8-plugins",
+]
+
+const docsListItems = packageNames.map(name => {
+  return {
+    type: 'doc',
+    label: name,
+    docId: `${name}/intro`,
+  }
+})
+
+const npmListItems = packageNames.map(name => {
+  return {
+    label: name,
+    href: `https://www.npmjs.com/package/${name}`,
+  }
+})
+
 
 const config: Config = {
   title: 'mute8 - JS State Container',
@@ -154,12 +179,12 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           // Remove this to remove the "edit this page" links.
-          editUrl:repoUrl,
+          editUrl: repoUrl,
         },
         blog: {
           showReadingTime: true,
           // Remove this to remove the "edit this page" links.
-          editUrl:repoUrl,
+          editUrl: repoUrl,
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -194,52 +219,13 @@ const config: Config = {
           type: 'dropdown',
           label: 'Docs',
           position: 'left',
-          // className: "short-dropdown",
-          items: [
-            {
-              type: 'doc',
-              label: 'mute8',
-              docId: 'mute8/intro',
-            },
-            {
-              type: 'doc',
-              label: 'mute8-react',
-              docId: 'mute8-react/intro',
-            },
-            {
-              type: 'doc',
-              label: 'mute8-solid',
-              docId: 'mute8-solid/intro',
-            },
-            {
-              type: 'doc',
-              label: 'mute8-plugins',
-              docId: 'mute8-plugins/intro',
-            },
-          ]
+          items: docsListItems
         },
         {
           type: 'dropdown',
           label: 'npm',
           position: 'right',
-          items: [
-            {
-              label: 'mute8',
-              href: 'https://www.npmjs.com/package/mute8',
-            },
-            {
-              label: 'mute8-react',
-              href: 'https://www.npmjs.com/package/mute8-react',
-            },
-            {
-              label: 'mute8-solid',
-              href: 'https://www.npmjs.com/package/mute8-solid',
-            },
-            {
-              label: 'mute8-plugins',
-              href: 'https://www.npmjs.com/package/mute8-plugins',
-            },
-          ],
+          items: npmListItems,
         },
         {
           href: 'https://github.com/PawelJastrzebski/mute8',
@@ -305,8 +291,5 @@ const config: Config = {
     },
   } satisfies Preset.ThemeConfig,
 };
-
-
-// console.log(JSON.stringify(prismThemes.vsDark))
 
 export default config;

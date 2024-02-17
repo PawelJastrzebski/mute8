@@ -13,3 +13,6 @@ Under construction 🚧
 ```sh
 npm i mute8
 ```
+
+# Examples
+For full examples go to [examples](https://github.com/PawelJastrzebski/mute8/tree/main/examples) directory.
