@@ -20,13 +20,13 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                     const [value, setValue] = createSignal(core.s.sanp());
                     const sub = core.s.sub(s => setValue(s as any))
                     onCleanup(() => sub.destroy())
-                    return [value, (v: any) => core.s.next(v)]
+                    return [value, (v: any) => core.s.mut(v)]
                 },
-                useOne(property: keyof T) {
+                useOne<K extends keyof T>(property: K & string) {
                     const [value, setValue] = createSignal((core.s.sanp() as any)[property]);
                     const sub = core.s.sub((s: any) => setValue(s[property]))
                     onCleanup(() => sub.destroy())
-                    return [value, (v: any) => core.update(property, v)]
+                    return [value, (v: any) => core.s.set(property, v)]
                 },
                 select<O>(fn: SelectFn<T, O>) {
                     const [value, setValue] = createSignal(fn(core.s.sanp()));

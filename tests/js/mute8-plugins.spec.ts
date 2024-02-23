@@ -5,13 +5,13 @@ import { newStore, Plugin } from "../../packages/mute8"
 
 test('Empty Plugin', async () => {
     const empty: Plugin<any> = {
-        BInit: function (initState: any) {
+        BI: function (initState: any) {
             return initState
         },
-        BUpdate: function (newState: any) {
+        BU: function (newState: any) {
             return newState
         },
-        AChange: function (oldState: Readonly<any>, newState: any): void { }
+        AC: function (oldState: Readonly<any>, newState: any): void { }
     }
 
     const store = newStore({

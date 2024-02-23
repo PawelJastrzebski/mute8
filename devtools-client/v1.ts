@@ -53,7 +53,7 @@ class DevTools implements DevToolsInterface {
                 onChange: onChange
             })
             return {
-                BInit: (initState) => {
+                BI: (initState) => {
                     onInit(initState)
 
                     if (options.logger.logInit) {
@@ -67,7 +67,7 @@ class DevTools implements DevToolsInterface {
                     }
                     return initState
                 },
-                BUpdate: (newState) => {
+                BU: (newState) => {
                     const ovverride = devtools.stateOverrides[label];
                     if (ovverride) {
                         newState = ovverride.state as T
@@ -78,7 +78,7 @@ class DevTools implements DevToolsInterface {
                     }
                     return newState
                 },
-                AChange: (oldState, newState) => {
+                AC: (oldState, newState) => {
                     onChange(oldState, newState)
                     if (options.logger.logChange) {
                         console.table({
