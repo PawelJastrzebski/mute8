@@ -20,7 +20,7 @@
     "publish": "npm run build && npm run publish:npm",
     "publish:npm": "cd ./packages && npm publish ./mute8 && npm publish ./mute8-react && npm publish ./mute8-plugins",
     "publish:npm:test": "cd ./packages && npm publish ./mute8 --dry-run && npm publish ./mute8-react --dry-run && npm publish ./mute8-plugins --dry-run",
-    "devtools": "cd devtools-client && npx tsup && mv -f dist/ ../docs/devtools/",
+    "devtools": "cd devtools-client && npx tsup && mv -f dist/v1.mjs ../docs/devtools/v1.mjs",
     "devtools:watch": "cd devtools-client && concurrently -n build,host 'npx tsup --watch' 'npx serve dist --cors -p 4040' ",
     "docs": "vite preview --outDir docs --base /mute8/ --port 4030"
   },
