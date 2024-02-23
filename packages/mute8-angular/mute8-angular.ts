@@ -25,7 +25,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                     }, options)
                     return sig.asReadonly()
                 },
-                useOne(property: keyof T) {
+                useOne<K extends keyof T>(property: K & string) {
                     const sig = signal((core.s.sanp() as any)[property]);
                     effect(onCleanup => {
                         const sub = core.s.sub(s => sig.set(s[property]))

@@ -8,23 +8,23 @@ export const CombinePlugins = (...plugins: PluginBuilder[]): PluginBuilder => {
             .filter(p => !!p) as Plugin<T>[]
 
         return {
-            BInit: (initState) => {
+            BI: (initState) => {
                 let final = initState;
                 for (let plugin of initializedPlugins) {
-                    final = plugin.BInit(final)
+                    final = plugin.BI(final)
                 }
                 return final
             },
-            BUpdate: (newState) => {
+            BU: (newState) => {
                 let final = newState;
                 for (let plugin of initializedPlugins) {
-                    final = plugin.BUpdate(final)
+                    final = plugin.BU(final)
                 }
                 return final
             },
-            AChange: (oldState, newState) => {
+            AC: (oldState, newState) => {
                 for (let plugin of initializedPlugins) {
-                    plugin.AChange(oldState, newState)
+                    plugin.AC(oldState, newState)
                 }
             }
         }
@@ -44,7 +44,7 @@ export const LocalStoragePlugin = {
 
         return <T>(_: StoreProxy<T, any, any>): Plugin<any> => {
             return {
-                BInit: (initState) => {
+                BI: (initState) => {
                     try {
                         const state = getItem();
                         if (!!state) {
@@ -53,8 +53,8 @@ export const LocalStoragePlugin = {
                     } catch (_) { }
                     return initState
                 },
-                BUpdate: (newState) => newState,
-                AChange: (_, newState) => { setItem(newState) }
+                BU: (newState) => newState,
+                AC: (_, newState) => { setItem(newState) }
             }
         }
     }

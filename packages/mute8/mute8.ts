@@ -7,20 +7,20 @@ const freeze = O.freeze
 const assign = O.assign;
 const entries = O.entries;
 const defineProperty = O.defineProperty;
-const isObject = (a: any) => typeof a == "object"
+const MUT_FN_NAME = "mut"
 
 export interface Plugin<T> {
     /** BeforeInit() */
-    BInit(initState: T): T
+    BI(initState: T): T
     /** BeforeUpdate() */
-    BUpdate(newState: T): T
+    BU(newState: T, actionName?: string): T
     /** AfterChange() */
-    AChange(oldState: Readonly<T>, newState: T): void
+    AC(oldState: Readonly<T>, newState: T, actionName?: string): void
 }
 const defaultPlugin: <T>() => Plugin<T> = () => ({
-    BInit: (v) => v,
-    BUpdate: (v) => v,
-    AChange: (v1, v2) => { }
+    BI: (v) => v,
+    BU: (v) => v,
+    AC: (v1, v2, a) => { }
 })
 
 class Subject<T> {
@@ -35,7 +35,7 @@ class Subject<T> {
         plugin?: Plugin<T> // plugins not allowed for Observer
     ) {
         this.p = plugin ?? defaultPlugin()
-        this.s = freeze(this.p.BInit(state))
+        this.s = freeze(this.p.BI(state))
     }
 
     destroy() {
@@ -55,24 +55,30 @@ class Subject<T> {
         }
     }
 
-    next(update: Partial<T>): void {
+    mut(update: Partial<T>, actionName?: string): void {
         // for Observer always full update
         let newFinal: T = update as T;
         if (!this.ps) {
-            newFinal = this.p.BUpdate(assign(deepClone(this.s), update))
+            newFinal = this.p.BU(assign(deepClone(this.s), update), actionName)
         }
 
         if (toJson(this.s) !== toJson(newFinal)) {
-            this.p.AChange(this.s, newFinal)
+            this.p.AC(this.s, newFinal, actionName)
             this.s = freeze(newFinal)
             // notify subscribers
-            O.keys(this.c).forEach(id => this.c[id](this.s))
+            O.keys(this.c).forEach(id => this.c[id](this.s), actionName)
         }
+    }
+
+    set<K extends keyof T>(key: K & string | typeof MUT_FN_NAME, value: T[K] | Partial<T>): void {
+        const actionName = "set." + key;
+        const v = (key === MUT_FN_NAME ? value : { [key]: value }) as Partial<T>;
+        this.mut(v, actionName)
     }
 
     select<O>(fn: SelectFn<T, O>): Observer<O> {
         const observer = new Subject(fn(this.sanp()))
-        observer.ps = this.sub((v) => observer.next(fn(v)))
+        observer.ps = this.sub((v) => observer.mut(fn(v)))
         return observer;
     }
 }
@@ -85,16 +91,16 @@ interface Observer<T> {
 }
 
 class StoreCore<T extends object, A, AA> {
+    private readonly p: StoreProxy<T, A, AA>;
     readonly s: Subject<T>
-    readonly p: StoreProxy<T, A, AA>; // proxy
 
-    constructor(state: T, actions: A, aactions: AA, plugin?: PluginBuilder) {
-        this.s = new Subject(state)
-        const asyncProxy = buildActionProxy(aactions, (_, fn) => {
+    constructor(d: StoreDefiniton<T, A, AA>) {
+        this.s = new Subject(d.value)
+        const asyncProxy = buildActionProxy(d.async ?? {} as AA, (_, fn) => {
             return async (...args: any[]) => await fn.bind(this.p)(...args)
         })
-        const actionsProxy = buildActionProxy(actions, (_, fn) => {
-            return (...args: any[]) => this.mut(v => fn.bind(v)(...args))
+        const actionsProxy = buildActionProxy(d.actions ?? {} as A, (name, fn) => {
+            return (...args: any[]) => this.mut(v => fn.bind(v)(...args), name)
         })
         // init proxy
         const core = this;
@@ -105,30 +111,45 @@ class StoreCore<T extends object, A, AA> {
             actions: actionsProxy,
             async: asyncProxy,
             /** @ts-ignore */
-            set mut(v: Partial<T>) { core.s.next(v) },
+            set mut(v: Partial<T>) { core.s.set(MUT_FN_NAME, v) },
             /** @ts-ignore */
             get mut() { return core.mut.bind(core) }
         }
 
         // init plugin
-        const p = plugin?.(this.p) ?? defaultPlugin()
-        this.s = new Subject(state, p)
+        const p = d.plugin?.(this.p) ?? defaultPlugin()
+        this.s = new Subject(d.value, p)
     }
 
-    mut(fn: (v: T) => void): void {
+    mut(fn: (v: T) => void, actionName?: string): void {
         const state = deepClone(this.s.sanp())
         fn(state)
-        this.s.next(state)
+        this.s.mut(state, actionName)
     }
 
-    /** updateValue() */
-    update(key: any, value: any): void {
-        if (key === "mut") {
-            this.s.next(value)
-        } else {
-            this.s.next({ [key]: value } as Partial<T>)
+    static build<T extends object, A, AA>(
+        state: StoreDefiniton<T, A, AA>,
+        ext?: ProxyExtension<T, A, AA>
+    ): Store<T, A, AA> {
+        const core = new StoreCore(state)
+        const extension = !ext ? {} : { [ext.name]: ext.init(core as StoreCore<any, any, any>) } as {}
+        const bigProxy = assign(extension, core.p)
+
+        // build store representation (proxy)
+        const store = {}
+        for (const [key, _] of entries(state.value)) {
+            defineProperty(store, key, {
+                get() { return core.s.sanp()[key] },
+                set(v) { core.s.set(key as any, v) }
+            })
         }
+        defineProperty(store, MUT_FN_NAME, {
+            get() { return core.mut.bind(core) },
+            set(v) { core.s.set(MUT_FN_NAME, v) }
+        })
+        return freeze(assign(store, bigProxy)) as Store<T, A, AA>
     }
+
 }
 
 const buildActionProxy = <T>(actions: T, proxy: (fnName: string, fn: Function) => Function): T => {
@@ -141,7 +162,7 @@ const buildActionProxy = <T>(actions: T, proxy: (fnName: string, fn: Function) =
 interface SmalProxy<T, A> {
     snap(): T
     set mut(v: Partial<T>)
-    get mut(): (fn: (v: T) => void) => void
+    get mut(): (fn: (v: T) => void, actionName?: string) => void
     actions: Readonly<A>
 }
 export interface StoreProxy<T, A, AA> extends SmalProxy<T, A> {
@@ -154,34 +175,8 @@ export interface ProxyExtension<T extends object, A, AA> {
     init(core: StoreCore<T, A, AA>): object
 }
 
-/**  
-* Use Only for internal ProxyExtension
-*/
-export const buildProxy = <T extends object, A, AA>(state: StoreDefiniton<T, A, AA>, ext?: ProxyExtension<T, A, AA>) => {
-    const core = new StoreCore(
-        state.value,
-        state.actions ?? {},
-        state.async ?? {},
-        state.plugin
-    )
-    const extension = !ext ? {} : { [ext.name]: ext.init(core as StoreCore<any, any, any>) } as {}
-    const bigProxy = assign(extension, core.p)
-
-    // build store representation (proxy)
-    const store = {}
-    for (const [key, _] of entries(state.value)) {
-        defineProperty(store, key, {
-            get() { return core.s.sanp()[key] },
-            set(v) { core.update(key, v) }
-        })
-    }
-    defineProperty(store, "mut", {
-        get() { return core.mut.bind(core) },
-        set(v) { core.s.next(v) }
-    })
-    return freeze(assign(store, bigProxy)) as Store<T, A, AA>
-}
-
+// Use Only for internal ProxyExtension
+export const buildProxy = StoreCore.build;
 type ExcludeKeys = { async?: never, actions?: never, snap?: never, sub?: never, mut?: never }
 // Public
 export type PluginBuilder = (<T extends object>(proxy: StoreProxy<T, any, any>) => Plugin<T>) | null

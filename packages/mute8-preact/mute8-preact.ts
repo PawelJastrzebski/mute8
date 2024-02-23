@@ -23,15 +23,15 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                         return () => sub.destroy()
                     }, [])
 
-                    return [value, (v: any) => core.s.next(v)]
+                    return [value, (v: any) => core.s.mut(v)]
                 },
-                useOne(property: keyof T) {
+                useOne<K extends keyof T>(property: K & string) {
                     const [value, setValue] = useState((core.s.sanp() as any)[property]);
                     useEffect(() => {
                         const sub = core.s.sub((s: any) => setValue(s[property]))
                         return () => sub.destroy()
                     }, [])
-                    return [value, (v: any) => core.update(property, v)]
+                    return [value, (v: any) => core.s.set(property, v)]
                 },
                 select<O>(fn: SelectFn<T, O>) {
                     const [value, setValue] = useState(fn(core.s.sanp()));

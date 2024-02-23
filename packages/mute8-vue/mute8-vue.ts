@@ -24,7 +24,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                     onUnmounted(() => sub.destroy())
                     return val
                 },
-                useOne(property: keyof T) {
+                useOne<K extends keyof T>(property: K & string) {
                     const val = ref((core.s.sanp() as any)[property])
                     const sub = core.s.sub(s => val.value = s[property] as any)
                     onUnmounted(() => sub.destroy())
