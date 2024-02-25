@@ -22,9 +22,9 @@ export const CombinePlugins = (...plugins: PluginBuilder[]): PluginBuilder => {
                 }
                 return final
             },
-            AC: (oldState, newState) => {
+            AC: (oldState, newState, actionName, args) => {
                 for (let plugin of initializedPlugins) {
-                    plugin.AC(oldState, newState)
+                    plugin.AC(oldState, newState, actionName, args)
                 }
             }
         }

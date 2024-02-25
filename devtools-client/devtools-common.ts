@@ -39,19 +39,25 @@ export namespace DevToolsPrivateTypes {
     }
 
     export interface InitState {
+        id: number,
         storageLabel: string,
         state: object
         time: number
     }
-
+    
+    export type ChangeStateCallArgs = any[] | {_fn: string };
     export interface ChangeState {
+        id: number,
         storageLabel: string,
         oldState: object,
-        newState: object,
+        state: object,
+        actionName: string | undefined
+        args: ChangeStateCallArgs
         time: number
     }
 
     export interface OverrideState {
+        id: number,
         state: object
     }
 

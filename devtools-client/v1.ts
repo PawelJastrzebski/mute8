@@ -1,7 +1,9 @@
 import { DevToolsOptions, DevToolsInterface, DEVTOOLS_KEY, DevToolsPrivateTypes as DevTypes, UI_URL, getDevToolsStatus, setDevToolsStatus } from "./devtools-common";
 import { StoreProxy, Plugin, PluginBuilder, } from "../packages/mute8/dist/mute8";
 import { WindowHost } from "cors-window"
+import { CallArgs } from "../packages/mute8/mute8";
 
+const now = () => new Date().getTime()
 const deepFreeze = <T extends Object>(object: T) => {
     for (const name of Object.keys(object)) {
         const value = object[name];
@@ -16,19 +18,12 @@ const DevToolsOptionsDefault: DevToolsOptions = {
     logger: { logChange: false, logInit: true },
     deepFreaze: true
 }
-interface Registry<T extends Object = any> {
-    label: string,
-    proxy: StoreProxy<T, any, any>
-    onInit: (oldState: T) => void
-    onChange: (oldState: T, newState: T) => void
-}
-
-const now = () => new Date().getTime()
 
 // Ovverides mute8-plugins implementation of DevTools
 class DevTools implements DevToolsInterface {
+    private id = 0;
     import = async () => { };
-    private sotrageRegistry: Map<string, Registry> = new Map();
+    private sotrageProxy: Map<string, StoreProxy<any, any, any>> = new Map();
     private dialogHost: WindowHost<DevTypes.Payload[]> | null
     private payloadBuffer: DevTypes.Payload[] = []
     private stateOverrides: Record<string, DevTypes.OverrideState> = {}
@@ -44,18 +39,10 @@ class DevTools implements DevToolsInterface {
     register(label: string, options: DevToolsOptions = DevToolsOptionsDefault): PluginBuilder {
         const devtools = this;
         return <T extends object, A, AA>(proxy: StoreProxy<T, A, AA>): Plugin<T> => {
-            const onInit = (v: T) => devtools.setStateInit(label, v)
-            const onChange = (v1: T, v2: T) => { devtools.setStateChanged(label, v1, v2) }
-            this.sotrageRegistry.set(label, {
-                label: label,
-                proxy: proxy,
-                onInit: onInit,
-                onChange: onChange
-            })
+            this.sotrageProxy.set(label, proxy)
             return {
                 BI: (initState) => {
-                    onInit(initState)
-
+                    devtools.setStateInit(label, initState)
                     if (options.logger.logInit) {
                         console.table({
                             [`${label}-init`]: initState,
@@ -78,8 +65,8 @@ class DevTools implements DevToolsInterface {
                     }
                     return newState
                 },
-                AC: (oldState, newState) => {
-                    onChange(oldState, newState)
+                AC: (oldState, newState, actionName, args) => {
+                    devtools.setStateChanged(label, oldState, newState, actionName, args)
                     if (options.logger.logChange) {
                         console.table({
                             [`${label}-old`]: oldState,
@@ -113,19 +100,25 @@ class DevTools implements DevToolsInterface {
         if (this.stateOverrides[label]) return
         this.postPayload([{
             stateInit: {
+                id: ++this.id,
                 storageLabel: label,
                 state: state,
                 time: now()
             }
         }])
     }
-    private setStateChanged(label: string, oldState: object, newState: object) {
+    private setStateChanged(label: string, oldState: object, newState: object, actionName?: string, args?: CallArgs) {
         if (this.stateOverrides[label]) return
+
+        const callArgs = typeof args === "function" ? { _fn: args + "" } : args;
         this.postPayload([{
             stateChanged: {
+                id: ++this.id,
                 storageLabel: label,
+                actionName: actionName,
+                args: callArgs ?? [],
                 oldState: oldState,
-                newState: newState,
+                state: newState,
                 time: now()
             }
         }])
@@ -136,7 +129,7 @@ class DevTools implements DevToolsInterface {
     }
     private onDevToolsDialogsOpen() {
         setDevToolsStatus("open")
-        const list = Array.from(this.sotrageRegistry.entries());
+        const list = Array.from(this.sotrageProxy.entries());
         this.dialogHost!.post([
             {
                 init: {
@@ -154,10 +147,10 @@ class DevTools implements DevToolsInterface {
             }
             if (p.stateOverrides) {
                 this.stateOverrides = p.stateOverrides ?? {}
-                for (const [label, registry] of this.sotrageRegistry.entries()) {
+                for (const [label, proxy] of this.sotrageProxy.entries()) {
                     const override = this.stateOverrides[label];
                     if (override) {
-                        registry.proxy.mut = override
+                        proxy.mut = override
                     }
                 }
             }
