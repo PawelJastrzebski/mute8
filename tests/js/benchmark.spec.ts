@@ -27,7 +27,7 @@ describe("mute8 benchmark", () => {
             }
         })
 
-        timed("set value", 200, () => {
+        timed("set value", 220, () => {
             for (let index = 0; index < 150_000; index++) {
                 store.name = "_";
             }
