@@ -25,14 +25,13 @@ const store = newStore({
     },
     setFetchState(state: FetchState) {
       this.state = state
-    }
+    },
   },
   async: {
     async fetchUsers() {
       if (this.snap().state === 'pending') {
         return
       }
-
       this.mut(v => {
         v.state = "pending"
         v.users = []
