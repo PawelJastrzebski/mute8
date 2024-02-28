@@ -21,7 +21,7 @@ npm i mute8-react
 ```
 
 ## Examples
-For full examples go to `examples` directory
+For full examples go to [`examples`](https://vscode.dev/github/PawelJastrzebski/mute8/tree/main/examples) directory
 
 #### Import
 ```ts
