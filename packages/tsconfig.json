@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "noImplicitThis": true,
+        "declaration": true,
+        "removeComments": false,
+        "noLib": false,
+        "noEmit": true,
+        "rootDir": "../.."
+    },
+    "include": [
+        "**.ts",
+    ],
+    "exclude": [
+        "**/dist",
+        "**/test"
+    ]
+}

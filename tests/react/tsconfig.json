@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+        "noImplicitThis": true,
+        "declaration": true,
+        "removeComments": false,
+        "noLib": false,
+        "noEmit": true,
+        "allowSyntheticDefaultImports": true,
+        "jsx": "react",
+        "rootDir": "./"
+    },
+    "include": [
+        "**.tsx",
+    ],
+    "exclude": [
+        "**/dist"
+    ]
+}

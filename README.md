@@ -1,6 +1,6 @@
 
 # mute8 - JS State Container
-![mute8](doc/mut8.svg)
+![mute8](documentation/mut8.svg)
 
 ### Under construction 🚧
 Project is in early stage of development
@@ -21,7 +21,7 @@ npm i mute8-react
 ```
 
 ## Examples
-For full examples go to `examples` directory
+For full examples go to [`examples`](https://vscode.dev/github/PawelJastrzebski/mute8/tree/main/examples) directory
 
 #### Import
 ```ts
@@ -113,8 +113,11 @@ function AddNew() {
 ```
 
 ## Use with TypeScript 💙
-
 To keep packages lightweight, we do not provide type validation at runtime.
+
+
+# DevTools
+Visit [documentation](https://paweljastrzebski.github.io/mute8) for more details
 
 ## Authors
 - Paweł Jastrzębski 🇵🇱

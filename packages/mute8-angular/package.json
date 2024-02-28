@@ -1,0 +1,27 @@
+{
+    "name": "mute8-angular",
+    "description": "Angular State Container",
+    "version": "0.0.0-alpha.2",
+    "type": "module",
+    "author": "Paweł Jastrzębski",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PawelJastrzebski/mute8.git"
+    },
+    "main": "dist/mute8-angular.cjs",
+    "module": "dist/mute8-angular.js",
+    "types": "dist/mute8-angular.d.ts",
+    "scripts": {},
+    "keywords": [
+        "Angular",
+        "State",
+        "Redux",
+        "Observable",
+        "Reactive",
+        "Immutable"
+    ],
+    "peerDependencies": {
+        "@angular/core": "^17.1.0"
+    }
+}
