@@ -1,7 +1,7 @@
 {
     "name": "mute8-solid",
     "description": "Solid State Container",
-    "version": "0.0.0-alpha.4",
+    "version": "1.0.0",
     "type": "module",
     "author": "Paweł Jastrzębski",
     "license": "MIT",
