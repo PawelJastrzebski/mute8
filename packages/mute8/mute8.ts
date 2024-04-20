@@ -67,7 +67,7 @@ class Subject<T> {
             this.p.AC(this.s, newFinal, actionName, args)
             this.s = freeze(newFinal)
             // notify subscribers
-            O.keys(this.c).forEach(id => this.c[id](this.s))
+            O.keys(this.c).forEach(id => this.c[id] && this.c[id](this.s))
         }
     }
 

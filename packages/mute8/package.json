@@ -1,7 +1,7 @@
 {
     "name": "mute8",
     "description": "JS State Container",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "type": "module",
     "author": "Paweł Jastrzębski",
     "license": "MIT",
