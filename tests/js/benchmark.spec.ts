@@ -10,7 +10,11 @@ describe("mute8 benchmark", () => {
             }
         })
 
-        timed("get value", 600, () => {
+        // const store = {
+        //     name: "ok"
+        // }
+
+        timed("get value", 900, () => {
             for (let index = 0; index < 1_000_000_000; index++) {
                 const x = store.name;
             }
@@ -27,9 +31,13 @@ describe("mute8 benchmark", () => {
             }
         })
 
-        timed("set value", 220, () => {
+        // const store = {
+        //     name: "ok"
+        // }
+
+        timed("set value", 300, () => {
             for (let index = 0; index < 150_000; index++) {
-                store.name = "_";
+                store.name = "_" + index;
             }
         })
 

@@ -170,14 +170,14 @@ describe("Unit mute8", () => {
 
     test('Selector array', async () => {
         const state = newStore({
-            value: { 
+            value: {
                 names: ["ok"]
-             },
-             actions: {
+            },
+            actions: {
                 addName(name: string) {
                     this.names.push(name)
                 }
-             }
+            }
         })
 
         const names = state.select((v) => v.names)
@@ -189,7 +189,7 @@ describe("Unit mute8", () => {
         expect(names_emited).toEqual([])
         state.names = ["direct"]
         expect(names_emited).toEqual(["direct"])
-        state.mut = {names: ["mut"]}
+        state.mut = { names: ["mut"] }
         expect(names_emited).toEqual(["mut"])
 
         state.actions.addName("add")
@@ -204,6 +204,40 @@ describe("Unit mute8", () => {
         expect(state.names).toEqual([])
         expect(state.snap().names).toEqual([])
     });
+})
+
+
+describe('Actions recursive', () => {
+
+    const store = newStore({
+        value: { number: 0 },
+        actions: {
+            recursiveAdd(limit: number) {
+                if (this.number == limit) {
+                    return;
+                }
+                this.number = this.number + 1;
+                this.actions.recursiveAdd(limit)
+            },
+            recursiveAdd2(limit: number) {
+                this.number = 0;
+                this.actions.recursiveAdd(limit)
+            }
+        },
+    })
+
+
+    test("recursive add", () => {
+        store.actions.recursiveAdd(100);
+        expect(store.number).toEqual(100)
+    })
+
+    test("recursive add2", () => {
+        store.actions.recursiveAdd2(20);
+        store.actions.recursiveAdd2(20);
+        expect(store.number).toEqual(20)
+    })
+
 })
 
 test('Example car store', async () => {

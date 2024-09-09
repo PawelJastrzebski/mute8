@@ -25,7 +25,7 @@
     "docs": "vite preview --outDir docs --base /mute8/ --port 4030"
   },
   "engines": {
-    "node": ">=21.0.0"
+    "node": ">=20.0.0"
   },
   "author": "Paweł Jastrzębski",
   "license": "MIT",
