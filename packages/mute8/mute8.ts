@@ -1,7 +1,7 @@
 // Utils
 const O = Object;
 const J = JSON;
-const toJson = J.stringify
+export const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;

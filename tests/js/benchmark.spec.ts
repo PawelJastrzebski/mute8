@@ -1,9 +1,12 @@
 import { newStore } from "../../packages/mute8"
-import { timed } from "./utils"
+import { timed, wait } from "./utils"
 
 describe("mute8 benchmark", () => {
 
-    test('get {value}', () => {
+    const waitOtherTestsToFinish = async () =>  await wait(3_000)
+
+    test('get {value}', async () => {
+        await waitOtherTestsToFinish()
         const store = newStore({
             value: {
                 name: "ok"
@@ -22,9 +25,10 @@ describe("mute8 benchmark", () => {
 
         expect(store).toBeTruthy()
         expect(store.name).toEqual("ok")
-    });
+    }, 10_000);
 
-    test('set {value}', () => {
+    test('set {value}', async () => {
+        await waitOtherTestsToFinish()
         const store = newStore({
             value: {
                 name: "ok"
@@ -43,6 +47,6 @@ describe("mute8 benchmark", () => {
 
         expect(store).toBeTruthy()
         expect(store.name).toBeTruthy()
-    });
+    }, 10_000);
 
 })

@@ -1,6 +1,7 @@
 import axios from "axios"
 import { render, renderWait } from "./utils"
 import { newStore } from "../../packages/mute8-solid"
+import { createEffect } from "solid-js";
 
 describe("Solid rendering", () => {
 
@@ -26,6 +27,58 @@ describe("Solid rendering", () => {
         store.counter = store.counter + 10
         await renderWait()
         expect(getText()).toEqual("12")
+    });
+
+    test('solid.useOne() - shoud fire proper object changes', async () => {
+        // update counts
+        let value_1_count = 0;
+        let value_2_count = 0;
+
+        function TestUseOne() {
+            const [value_1] = store.solid.useOne('value_1')
+            const [value_2] = store.solid.useOne('value_2')
+
+            createEffect(() => {
+                value_1()
+                value_1_count++;
+            })
+
+            createEffect(() => {
+                value_2()
+                value_2_count++;
+            })
+
+            return (<>
+                <div id="value_1">{value_1().v}</div>
+                <div id="value_2">{value_2().v}</div>
+            </>)
+        }
+
+        const store = newStore({
+            value: {
+                value_1: { v: 1 },
+                value_2: { v: 2 }
+            }
+        })
+        const root = await render(<TestUseOne />)
+
+        // update value_1 - once
+        store.value_1 = { v: 2 };
+        await renderWait()
+        expect(value_1_count).toEqual(2)
+        expect(value_2_count).toEqual(1)
+
+        // update value_2 - 2 times
+        store.value_2 = { v: 3 };
+        await renderWait()
+        store.value_2 = { v: 4 };
+        await renderWait()
+        expect(value_1_count).toEqual(2)
+        expect(value_2_count).toEqual(3)
+
+        // test DOM values
+        expect(root.querySelector("#value_1")?.innerHTML).toEqual("2")
+        expect(root.querySelector("#value_2")?.innerHTML).toEqual("4")
     });
 
     test('solid.select()', async () => {
