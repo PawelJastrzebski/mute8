@@ -1,13 +1,14 @@
 // Utils
 const O = Object;
 const J = JSON;
-const toJson = J.stringify
+export const toJson = J.stringify
 const deepClone = (obj: object) => J.parse(toJson(obj))
 const freeze = O.freeze
 const assign = O.assign;
 const entries = O.entries;
 const defineProperty = O.defineProperty;
 const MUT_FN_NAME = "mut"
+const BIND_SYMBOLD = Symbol()
 
 export type CallArgs = any[] | Function;
 export interface Plugin<T> {
@@ -56,6 +57,12 @@ class Subject<T> {
         }
     }
 
+    select<O>(fn: SelectFn<T, O>): Observer<O> {
+        const observer = new Subject(fn(this.sanp()))
+        observer.ps = this.sub(v => observer.mut(fn(v)))
+        return observer;
+    }
+
     mut(update: Partial<T>, actionName?: string, args?: CallArgs): void {
         // for Observer always full update
         let newFinal: T = update as T;
@@ -67,7 +74,7 @@ class Subject<T> {
             this.p.AC(this.s, newFinal, actionName, args)
             this.s = freeze(newFinal)
             // notify subscribers
-            O.keys(this.c).forEach(id => this.c[id](this.s))
+            O.keys(this.c).forEach(id => this.c[id]?.(this.s))
         }
     }
 
@@ -75,12 +82,6 @@ class Subject<T> {
         const actionName = "set." + key;
         const v = (key === MUT_FN_NAME ? value : { [key]: value }) as Partial<T>;
         this.mut(v, actionName, [value])
-    }
-
-    select<O>(fn: SelectFn<T, O>): Observer<O> {
-        const observer = new Subject(fn(this.sanp()))
-        observer.ps = this.sub((v) => observer.mut(fn(v)))
-        return observer;
     }
 }
 
@@ -92,25 +93,31 @@ interface Observer<T> {
 }
 
 class StoreCore<T extends object, A, AA> {
-    private readonly p: StoreProxy<T, A, AA>;
+    private readonly p: Readonly<StoreProxy<T, A, AA>>;
     readonly s: Subject<T>
 
     constructor(d: StoreDefiniton<T, A, AA>) {
+        const core = this;
         this.s = new Subject(d.value)
+        
         const asyncProxy = buildActionProxy(d.async ?? {} as AA, (_, fn) => {
-            return async (...args: any[]) => await fn.bind(this.p)(...args)
+            return async (...args: any[]) => await fn.bind(core.p)(...args)
         })
         const actionsProxy = buildActionProxy(d.actions ?? {} as A, (name, fn) => {
-            return (...args: any[]) => this.mut(v => fn.bind(v)(...args), name, args)
+            return (...args: any[]) => core.mut(v => fn.bind(v)(...args), name, args)
         })
+        // experimental (recursive actions)
+        core[BIND_SYMBOLD] = buildActionProxy(d.actions ?? {} as A, (_, fn) => {
+            return (...args: any[]) => fn.bind(core[BIND_SYMBOLD][BIND_SYMBOLD])(...args)
+        })
+
         // init proxy
-        const core = this;
         this.p = {
             snap: () => core.s.sanp(),
-            sub: (v) => core.s.sub(v),
-            select: (f) => core.s.select(f),
-            actions: actionsProxy,
-            async: asyncProxy,
+            sub: (v: any) => core.s.sub(v),
+            select: (f: any) => core.s.select(f),
+            actions: freeze(actionsProxy),
+            async: freeze(asyncProxy),
             /** @ts-ignore */
             set mut(v: Partial<T>) { core.s.set(MUT_FN_NAME, v) },
             /** @ts-ignore */
@@ -118,14 +125,19 @@ class StoreCore<T extends object, A, AA> {
         }
 
         // init plugin
-        const p = d.plugin?.(this.p) ?? defaultPlugin()
+        const p = d.plugin?.(core.p) ?? defaultPlugin()
         this.s = new Subject(d.value, p)
     }
 
+    // synchronius / non async
     private mut(fn: (v: T) => void, actionName?: string, args?: any[]): void {
-        const state = deepClone(this.s.sanp())
+        const core = this;
+        const state = deepClone(core.s.sanp())
+        core[BIND_SYMBOLD][BIND_SYMBOLD] = state;
+        assign(state, {actions: core[BIND_SYMBOLD]})
         fn(state)
-        this.s.mut(state, actionName, args ?? fn)
+        delete state.actions
+        core.s.mut(state, actionName, args ?? fn)
     }
 
     static build<T extends object, A, AA>(
@@ -137,26 +149,27 @@ class StoreCore<T extends object, A, AA> {
         const bigProxy = assign(extension, core.p)
 
         // build store representation (proxy)
+        const subject = core.s;
         const store = {}
         for (const [key, _] of entries(state.value)) {
             defineProperty(store, key, {
-                get() { return core.s.sanp()[key] },
-                set(v) { core.s.set(key as any, v) }
+                get() { return subject.sanp()[key] },
+                set(v) { subject.set(key as any, v) }
             })
         }
         defineProperty(store, MUT_FN_NAME, {
             get() { return core.mut.bind(core) },
-            set(v) { core.s.set(MUT_FN_NAME, v) }
+            set(v) { subject.set(MUT_FN_NAME, v) }
         })
         return freeze(assign(store, bigProxy)) as Store<T, A, AA>
     }
 
 }
 
-const buildActionProxy = <T>(actions: T, proxy: (fnName: string, fn: Function) => Function): T => {
+const buildActionProxy = <T>(actions: T, proxy: (fnName: string, builder: Function) => Function): T => {
     const aProxy: Record<string, Function> = {}
     entries(actions as object).forEach(([name, fn]) => aProxy[name] = proxy(name, fn))
-    return freeze(aProxy) as T
+    return aProxy as T
 }
 
 // Proxy
@@ -190,7 +203,7 @@ export type VoidFn = ((...args: any) => undefined)
 export type AsyncFn = ((...args: any) => Promise<void>);
 export interface StoreDefiniton<T extends object, A, AA> {
     value: T & object & ExcludeKeys
-    actions?: A & ThisType<T> & Record<string, VoidFn>
+    actions?: A & ThisType<T & {actions: Readonly<A>}> & Record<string, VoidFn>
     async?: AA & ThisType<SmalProxy<T, A>> & Record<string, AsyncFn>
     plugin?: PluginBuilder
 }

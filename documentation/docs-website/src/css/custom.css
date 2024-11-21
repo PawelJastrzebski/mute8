@@ -209,6 +209,7 @@ html[data-theme='dark'] .header-github-link:before {
 #frameworks-section .items {
   padding: 35px;
   display: flex;
+  align-items: center;
   gap: 28px;
   filter: contrast(1.1) opacity(0.8);
   transition: 300ms ease-in-out;

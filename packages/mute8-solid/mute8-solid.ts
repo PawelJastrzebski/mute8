@@ -1,5 +1,5 @@
-import { Store as StoreMute8, StoreDefiniton, ProxyExtension, buildProxy, SelectFn } from "../mute8/mute8"
-import { createSignal, Accessor, onCleanup, } from 'solid-js';
+import { Store as StoreMute8, StoreDefiniton, ProxyExtension, buildProxy, SelectFn, toJson } from "../mute8/mute8"
+import { createSignal, onCleanup, type Accessor, type SignalOptions, } from 'solid-js';
 
 interface SolidExtension<T> {
     use(): [Accessor<T>, (newValeu: Partial<T>) => void]
@@ -9,6 +9,10 @@ interface SolidExtension<T> {
 
 export type Store<T, A, AA> = StoreMute8<T, A, AA> & {
     solid: SolidExtension<T>
+}
+
+const options: SignalOptions<any> = {
+    equals: (prev, cur) => toJson(prev) == toJson(cur)
 }
 
 export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA>) => {
@@ -23,7 +27,7 @@ export const newStore = <T extends Object, A, AA>(store: StoreDefiniton<T, A, AA
                     return [value, (v: any) => core.s.mut(v)]
                 },
                 useOne<K extends keyof T>(property: K & string) {
-                    const [value, setValue] = createSignal((core.s.sanp() as any)[property]);
+                    const [value, setValue] = createSignal((core.s.sanp() as any)[property], options);
                     const sub = core.s.sub((s: any) => setValue(s[property]))
                     onCleanup(() => sub.destroy())
                     return [value, (v: any) => core.s.set(property, v)]

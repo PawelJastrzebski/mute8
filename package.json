@@ -25,14 +25,14 @@
     "docs": "vite preview --outDir docs --base /mute8/ --port 4030"
   },
   "engines": {
-    "node": ">=21.0.0"
+    "node": ">=20.0.0"
   },
   "author": "Paweł Jastrzębski",
   "license": "MIT",
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "solid-js": "^1.8.14",
+    "solid-js": "^1.9.3",
     "@angular/core": "^17.1.0",
     "preact": "^10.19.3",
     "vue": "^3.4.15"
