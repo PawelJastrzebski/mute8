@@ -1,8 +1,12 @@
-import clsx from 'clsx';
 import Link from '@docusaurus/Link';
+import { useLocation } from '@docusaurus/router';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import { useLocation } from '@docusaurus/router';
+import angularLogo from "../../static/img/frameworks/angular_logo.png";
+import solidLogo from "../../static/img/frameworks/solid_logo.png";
+import preactLogo from "../../static/img/frameworks/preact_logo.png";
+import vuewLogo from "../../static/img/frameworks/vue_logo.png";
+import reactLogo from "../../static/img/frameworks/react_logo.png";
 
 function Logo() {
   const logo = <div><div className="img"></div></div>
@@ -14,11 +18,11 @@ function Logo() {
 }
 
 const frameworks = [
-  { url: "https://angular.io/assets/images/logos/angular/angular.svg", alt: "mute8-angular", color: "DD0031" },
-  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/preact.svg", alt: "mute8-preact", color: "762CFB" },
-  { url: "https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg", alt: "mute8-vue", color: "41B883" },
-  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/react.svg", alt: "mute8-react", color: "61DAFB" },
-  { url: "https://raw.githubusercontent.com/prplx/svg-logos/master/svg/solidjs-icon.svg", alt: "mute8-solid", color: "3864A5" },
+  { url: angularLogo, alt: "mute8-angular", color: "DD0031" },
+  { url: preactLogo, alt: "mute8-preact", color: "762CFB" },
+  { url: vuewLogo, alt: "mute8-vue", color: "41B883" },
+  { url: reactLogo, alt: "mute8-react", color: "61DAFB" },
+  { url: solidLogo, alt: "mute8-solid", color: "3864A5" },
 ]
 
 function FrameworksSection() {
